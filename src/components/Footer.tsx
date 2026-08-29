@@ -118,7 +118,8 @@ export const Footer: React.FC<FooterProps> = ({ onNavigate, onOpenEmergency }) =
               <p>{config.hours.weekdaysMorning}</p>
               <p>{config.hours.weekdaysEvening}</p>
               <p className="text-pink-200 font-bold pt-1">Sunday:</p>
-              <p>{config.hours.sunday}</p>
+              <p className="text-rose-300 font-bold">{config.hours.sunday}</p>
+              <p className="text-amber-200/90 font-semibold pt-2 leading-relaxed">{config.hours.festivalNotice}</p>
             </div>
           </div>
 

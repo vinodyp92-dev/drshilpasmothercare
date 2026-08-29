@@ -99,6 +99,11 @@ export const BookingSection: React.FC<BookingSectionProps> = ({
             Fill in your details below. We will open WhatsApp with a ready message — send it to
             reception and they will confirm your slot.
           </p>
+          <p className="text-xs text-amber-900 bg-amber-50 border border-amber-200 rounded-xl px-4 py-2.5 max-w-xl mx-auto leading-relaxed font-medium">
+            <span className="font-bold">Timings:</span> Mon–Sat {config.hours.weekdaysMorning} &{' '}
+            {config.hours.weekdaysEvening}. <span className="font-bold">Sunday: Closed.</span>{' '}
+            {config.hours.festivalNotice}
+          </p>
         </div>
 
         {sent ? (

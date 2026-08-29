@@ -19,6 +19,7 @@ export interface ClinicConfig {
     weekdaysEvening: string;
     saturday: string;
     sunday: string;
+    festivalNotice: string;
     urgentCare: string;
   };
   consultationFee: number;
@@ -43,6 +44,7 @@ export const CLINIC_CONFIG: ClinicConfig = {
     weekdaysEvening: CONSULTATION_HOURS_DISPLAY.weekdaysEvening,
     saturday: CONSULTATION_HOURS_DISPLAY.saturday,
     sunday: CONSULTATION_HOURS_DISPLAY.sunday,
+    festivalNotice: CONSULTATION_HOURS_DISPLAY.festivalNotice,
     urgentCare: CONSULTATION_HOURS_DISPLAY.urgentCare
   },
   consultationFee: 400,

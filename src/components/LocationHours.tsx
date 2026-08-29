@@ -67,8 +67,13 @@ export const LocationHours: React.FC = () => {
                 <div className="pb-2 border-b border-pink-100">
                   <div className="flex justify-between font-bold text-slate-900">
                     <span>Sunday:</span>
-                    <span className="text-rose-700">{config.hours.sunday}</span>
+                    <span className="text-rose-700 font-extrabold">{config.hours.sunday}</span>
                   </div>
+                </div>
+
+                <div className="p-3 bg-amber-50 rounded-2xl border border-amber-300 text-amber-950 font-semibold leading-relaxed text-[11px]">
+                  <span className="font-extrabold block text-amber-900 mb-1">Festivals & special occasions</span>
+                  {config.hours.festivalNotice}
                 </div>
 
                 <div className="p-3 bg-pink-100/70 rounded-2xl border border-pink-200 text-pink-950 font-semibold leading-relaxed text-[11px]">
