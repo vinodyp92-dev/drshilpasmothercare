@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Phone, MapPin, AlertCircle, Calendar, Menu, X } from 'lucide-react';
 import { useClinicConfig } from '../context/ClinicConfigContext';
+import { isClinicOpenNow } from '../utils/clinicHours';
 import { ClinicLogo } from './ClinicLogo';
 
 interface HeaderProps {
@@ -29,15 +30,11 @@ export const Header: React.FC<HeaderProps> = ({
   }, []);
 
   useEffect(() => {
-    const now = new Date();
-    const day = now.getDay();
-    const hour = now.getHours();
+    const updateOpenStatus = () => setIsOpenNow(isClinicOpenNow());
 
-    if (day >= 1 && day <= 6) {
-      setIsOpenNow((hour >= 9 && hour < 14) || (hour >= 17 && hour < 21));
-    } else {
-      setIsOpenNow(hour >= 10 && hour < 13);
-    }
+    updateOpenStatus();
+    const id = window.setInterval(updateOpenStatus, 60_000);
+    return () => window.clearInterval(id);
   }, [config.hours]);
 
   const navItems = [

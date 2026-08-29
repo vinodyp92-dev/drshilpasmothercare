@@ -13,24 +13,12 @@ import {
 import { DOCTORS_DATA, SERVICES_DATA } from '../data/clinicData';
 import { useClinicConfig } from '../context/ClinicConfigContext';
 import { buildBookingRequestMessage, openWhatsappChat } from '../utils/whatsapp';
+import { BOOKING_TIME_PREFERENCES } from '../utils/clinicHours';
 
 interface BookingSectionProps {
   preselectedDoctorId?: string;
   preselectedServiceName?: string;
 }
-
-const TIME_PREFERENCES = [
-  '09:30 AM',
-  '10:15 AM',
-  '11:00 AM',
-  '11:45 AM',
-  '12:30 PM',
-  '05:00 PM',
-  '05:45 PM',
-  '06:30 PM',
-  '07:15 PM',
-  '08:00 PM'
-];
 
 export const BookingSection: React.FC<BookingSectionProps> = ({
   preselectedDoctorId,
@@ -207,7 +195,7 @@ export const BookingSection: React.FC<BookingSectionProps> = ({
                   onChange={(e) => setPreferredTime(e.target.value)}
                   className="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm font-medium focus:ring-2 focus:ring-pink-500"
                 >
-                  {TIME_PREFERENCES.map((t) => (
+                  {BOOKING_TIME_PREFERENCES.map((t) => (
                     <option key={t} value={t}>
                       {t}
                     </option>

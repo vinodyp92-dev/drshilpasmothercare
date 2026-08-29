@@ -1,4 +1,5 @@
 import React, { createContext, useContext } from 'react';
+import { CONSULTATION_HOURS_DISPLAY } from '../utils/clinicHours';
 
 export interface ClinicConfig {
   name: string;
@@ -38,11 +39,11 @@ export const CLINIC_CONFIG: ClinicConfig = {
   doctorWhatsapp: '+91 98450 12345',
   receptionistWhatsapp: '+91 99001 88776',
   hours: {
-    weekdaysMorning: '9:30 AM – 1:30 PM',
-    weekdaysEvening: '5:00 PM – 8:30 PM',
-    saturday: '9:30 AM – 1:30 PM & 5:00 PM – 8:30 PM',
-    sunday: '10:00 AM – 1:00 PM (Prior Appointment)',
-    urgentCare: '24/7 On-Call Obstetric & Emergency Support'
+    weekdaysMorning: CONSULTATION_HOURS_DISPLAY.weekdaysMorning,
+    weekdaysEvening: CONSULTATION_HOURS_DISPLAY.weekdaysEvening,
+    saturday: CONSULTATION_HOURS_DISPLAY.saturday,
+    sunday: CONSULTATION_HOURS_DISPLAY.sunday,
+    urgentCare: CONSULTATION_HOURS_DISPLAY.urgentCare
   },
   consultationFee: 400,
   accreditation: [

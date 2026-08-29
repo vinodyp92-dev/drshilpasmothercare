@@ -1,5 +1,10 @@
 import { Doctor, MedicalService, InsuranceProvider, PatientReview } from '../types/clinic';
 import drShilpaImg from '../assets/images/dr_shilpa_official_1786535230073.jpg';
+import {
+  CONSULTATION_HOURS_DISPLAY,
+  DOCTOR_TIME_SLOTS,
+  getConsultationTimingsFaqAnswer
+} from '../utils/clinicHours';
 
 export const CLINIC_INFO = {
   name: "Dr. Shilpa's Mother Care Speciality Clinic",
@@ -11,10 +16,10 @@ export const CLINIC_INFO = {
   emergencyHotline: '+91 98450 99999 / 108 Emergency',
   email: 'care@drshilpamothercare.in',
   hours: {
-    weekdays: 'Morning: 9:30 AM – 1:30 PM | Evening: 5:00 PM – 8:30 PM',
-    saturday: 'Morning: 9:30 AM – 1:30 PM | Evening: 5:00 PM – 8:30 PM',
-    sunday: '10:00 AM – 1:00 PM (Prior Appointment)',
-    urgentCare: '24/7 On-Call Obstetric & Emergency Care'
+    weekdays: `Morning: ${CONSULTATION_HOURS_DISPLAY.weekdaysMorning} | Evening: ${CONSULTATION_HOURS_DISPLAY.weekdaysEvening}`,
+    saturday: `Morning: ${CONSULTATION_HOURS_DISPLAY.weekdaysMorning} | Evening: ${CONSULTATION_HOURS_DISPLAY.weekdaysEvening}`,
+    sunday: CONSULTATION_HOURS_DISPLAY.sunday,
+    urgentCare: CONSULTATION_HOURS_DISPLAY.urgentCare
   },
   accreditation: [
     'Board Certified Obstetrician & Gynaecologist',
@@ -40,7 +45,7 @@ export const DOCTORS_DATA: Doctor[] = [
     specialties: ['High Risk Pregnancy Management', 'Infertility Evaluation & IUI', 'Antenatal & Postnatal Care', 'PCOS & Hormonal Care', 'Laparoscopic Gynaecology'],
     consultationFee: 400,
     availableDays: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'],
-    timeSlots: ['09:30 AM', '11:00 AM', '12:30 PM', '05:00 PM', '06:30 PM', '07:45 PM'],
+    timeSlots: [...DOCTOR_TIME_SLOTS.shilpa],
     acceptingNewPatients: true,
     education: 'MS (OBG) Bangalore Medical College, MBBS Mysore Medical College',
     location: 'Mother Care Speciality Clinic - Main Consultation Suite'
@@ -60,7 +65,7 @@ export const DOCTORS_DATA: Doctor[] = [
     specialties: ['Primary Care Consultations', 'Hypertension & Diabetes Care', 'Preventive Health Screening', 'Family Wellness'],
     consultationFee: 350,
     availableDays: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'],
-    timeSlots: ['10:30 AM', '12:00 PM', '05:00 PM', '06:30 PM'],
+    timeSlots: [...DOCTOR_TIME_SLOTS.sunil],
     acceptingNewPatients: true,
     education: 'MD General Medicine KIMS, MBBS Bangalore Medical College',
     location: 'Primary Care Suite - Room 2'
@@ -311,7 +316,7 @@ export const FAQS_DATA = [
   },
   {
     question: 'What are the clinic consultation timings?',
-    answer: 'Our regular clinic timings are Monday to Saturday: Morning 9:30 AM – 1:30 PM & Evening 5:00 PM – 8:30 PM. Sunday: 10:00 AM – 1:00 PM (Prior Appointment). To book, use the form on this site or message us on WhatsApp — reception will confirm your slot.'
+    answer: getConsultationTimingsFaqAnswer()
   },
   {
     question: 'Where is the clinic located in Tumakuru?',
