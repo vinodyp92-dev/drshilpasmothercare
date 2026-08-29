@@ -35,7 +35,7 @@ export const BookingSection: React.FC<BookingSectionProps> = ({
   const [preferredDate, setPreferredDate] = useState(
     new Date(Date.now() + 86400000).toISOString().split('T')[0]
   );
-  const [preferredTime, setPreferredTime] = useState('10:15 AM');
+  const [preferredTime, setPreferredTime] = useState('05:15 PM');
   const [patientName, setPatientName] = useState('');
   const [patientPhone, setPatientPhone] = useState('');
   const [reason, setReason] = useState('');
@@ -100,9 +100,8 @@ export const BookingSection: React.FC<BookingSectionProps> = ({
             reception and they will confirm your slot.
           </p>
           <p className="text-xs text-amber-900 bg-amber-50 border border-amber-200 rounded-xl px-4 py-2.5 max-w-xl mx-auto leading-relaxed font-medium">
-            <span className="font-bold">Timings:</span> Mon–Sat {config.hours.weekdaysMorning} &{' '}
-            {config.hours.weekdaysEvening}. <span className="font-bold">Sunday: Closed.</span>{' '}
-            {config.hours.festivalNotice}
+            <span className="font-bold">Timings:</span> Mon–Sat {config.hours.weekdays}.{' '}
+            <span className="font-bold">Sunday: Closed.</span> {config.hours.festivalNotice}
           </p>
         </div>
 

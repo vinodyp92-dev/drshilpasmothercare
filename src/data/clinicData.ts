@@ -16,8 +16,8 @@ export const CLINIC_INFO = {
   emergencyHotline: '+91 98450 99999 / 108 Emergency',
   email: 'care@drshilpamothercare.in',
   hours: {
-    weekdays: `Morning: ${CONSULTATION_HOURS_DISPLAY.weekdaysMorning} | Evening: ${CONSULTATION_HOURS_DISPLAY.weekdaysEvening}`,
-    saturday: `Morning: ${CONSULTATION_HOURS_DISPLAY.weekdaysMorning} | Evening: ${CONSULTATION_HOURS_DISPLAY.weekdaysEvening}`,
+    weekdays: CONSULTATION_HOURS_DISPLAY.weekdays,
+    saturday: CONSULTATION_HOURS_DISPLAY.saturday,
     sunday: CONSULTATION_HOURS_DISPLAY.sunday,
     urgentCare: CONSULTATION_HOURS_DISPLAY.urgentCare
   },

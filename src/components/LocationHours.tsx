@@ -48,12 +48,8 @@ export const LocationHours: React.FC = () => {
                 <div className="pb-2 border-b border-pink-100">
                   <span className="font-extrabold text-slate-900 block mb-0.5">Monday – Friday</span>
                   <div className="flex justify-between text-pink-900 font-bold">
-                    <span>Morning Session:</span>
-                    <span>{config.hours.weekdaysMorning}</span>
-                  </div>
-                  <div className="flex justify-between text-pink-900 font-bold mt-1">
-                    <span>Evening Session:</span>
-                    <span>{config.hours.weekdaysEvening}</span>
+                    <span>Evening consultation:</span>
+                    <span>{config.hours.weekdays}</span>
                   </div>
                 </div>
 

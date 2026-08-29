@@ -114,9 +114,9 @@ export const Footer: React.FC<FooterProps> = ({ onNavigate, onOpenEmergency }) =
               Operating Timings
             </h4>
             <div className="space-y-1.5 text-xs text-slate-400 font-medium">
-              <p className="text-pink-200 font-bold">Weekdays & Saturday:</p>
-              <p>{config.hours.weekdaysMorning}</p>
-              <p>{config.hours.weekdaysEvening}</p>
+              <p className="text-pink-200 font-bold">Mon–Sat (evening only):</p>
+              <p>{config.hours.weekdays.replace(' (Evening consultation)', '')}</p>
+              <p className="text-slate-500 text-[11px]">Morning consultation is not offered at present.</p>
               <p className="text-pink-200 font-bold pt-1">Sunday:</p>
               <p className="text-rose-300 font-bold">{config.hours.sunday}</p>
               <p className="text-amber-200/90 font-semibold pt-2 leading-relaxed">{config.hours.festivalNotice}</p>

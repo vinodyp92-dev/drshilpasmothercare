@@ -25,13 +25,13 @@ const formatSlotTime = (hour: number, minute: number) => {
   return `${hour12.toString().padStart(2, '0')}:${minute.toString().padStart(2, '0')} ${period}`;
 };
 
-const WEEKDAY_MORNING: TimeWindow = { start: { hour: 9, minute: 30 }, end: { hour: 13, minute: 30 } };
-const WEEKDAY_EVENING: TimeWindow = { start: { hour: 16, minute: 30 }, end: { hour: 20, minute: 30 } };
+const EVENING_CONSULTATION: TimeWindow = { start: { hour: 16, minute: 30 }, end: { hour: 20, minute: 30 } };
+
+const EVENING_HOURS = `${formatTime(16, 30)} – ${formatTime(20, 30)}`;
 
 export const CONSULTATION_HOURS_DISPLAY = {
-  weekdaysMorning: `${formatTime(9, 30)} – ${formatTime(13, 30)}`,
-  weekdaysEvening: `${formatTime(16, 30)} – ${formatTime(20, 30)}`,
-  saturday: `${formatTime(9, 30)} – ${formatTime(13, 30)} & ${formatTime(16, 30)} – ${formatTime(20, 30)}`,
+  weekdays: `${EVENING_HOURS} (Evening consultation)`,
+  saturday: EVENING_HOURS,
   sunday: 'Closed',
   festivalNotice:
     'On festivals and special occasions, clinic timings may change. Please call or WhatsApp reception to confirm before visiting.',
@@ -62,17 +62,15 @@ const generateSlotTimes = (windows: TimeWindow[], intervalMinutes = 45): string[
   return slots;
 };
 
-const WEEKDAY_WINDOWS = [WEEKDAY_MORNING, WEEKDAY_EVENING];
-
-export const BOOKING_TIME_PREFERENCES = generateSlotTimes(WEEKDAY_WINDOWS);
+export const BOOKING_TIME_PREFERENCES = generateSlotTimes([EVENING_CONSULTATION]);
 
 export const DOCTOR_TIME_SLOTS = {
-  shilpa: ['09:30 AM', '11:00 AM', '12:30 PM', '04:30 PM', '05:30 PM', '06:30 PM', '07:30 PM'],
-  sunil: ['10:30 AM', '12:00 PM', '04:30 PM', '05:30 PM', '06:30 PM']
+  shilpa: ['04:30 PM', '05:15 PM', '06:00 PM', '06:45 PM', '07:30 PM'],
+  sunil: ['04:30 PM', '05:15 PM', '06:00 PM', '06:45 PM']
 } as const;
 
 export const getConsultationTimingsFaqAnswer = () =>
-  `Our regular clinic timings are Monday to Saturday: Morning ${CONSULTATION_HOURS_DISPLAY.weekdaysMorning} & Evening ${CONSULTATION_HOURS_DISPLAY.weekdaysEvening}. Sunday: ${CONSULTATION_HOURS_DISPLAY.sunday}. ${CONSULTATION_HOURS_DISPLAY.festivalNotice} To book, use the form on this site or message us on WhatsApp — reception will confirm your slot.`;
+  `Our regular clinic timings are Monday to Saturday: ${EVENING_HOURS} (evening consultation only; morning OPD is not offered at present). Sunday: ${CONSULTATION_HOURS_DISPLAY.sunday}. ${CONSULTATION_HOURS_DISPLAY.festivalNotice} To book, use the form on this site or message us on WhatsApp — reception will confirm your slot.`;
 
 export const isClinicOpenNow = (date = new Date()): boolean => {
   const day = date.getDay();
@@ -83,7 +81,7 @@ export const isClinicOpenNow = (date = new Date()): boolean => {
   }
 
   if (day >= 1 && day <= 6) {
-    return isWithinWindow(nowMinutes, WEEKDAY_MORNING) || isWithinWindow(nowMinutes, WEEKDAY_EVENING);
+    return isWithinWindow(nowMinutes, EVENING_CONSULTATION);
   }
 
   return false;

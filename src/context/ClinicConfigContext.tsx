@@ -15,8 +15,7 @@ export interface ClinicConfig {
   doctorWhatsapp: string;
   receptionistWhatsapp: string;
   hours: {
-    weekdaysMorning: string;
-    weekdaysEvening: string;
+    weekdays: string;
     saturday: string;
     sunday: string;
     festivalNotice: string;
@@ -40,8 +39,7 @@ export const CLINIC_CONFIG: ClinicConfig = {
   doctorWhatsapp: '+91 98450 12345',
   receptionistWhatsapp: '+91 99001 88776',
   hours: {
-    weekdaysMorning: CONSULTATION_HOURS_DISPLAY.weekdaysMorning,
-    weekdaysEvening: CONSULTATION_HOURS_DISPLAY.weekdaysEvening,
+    weekdays: CONSULTATION_HOURS_DISPLAY.weekdays,
     saturday: CONSULTATION_HOURS_DISPLAY.saturday,
     sunday: CONSULTATION_HOURS_DISPLAY.sunday,
     festivalNotice: CONSULTATION_HOURS_DISPLAY.festivalNotice,
