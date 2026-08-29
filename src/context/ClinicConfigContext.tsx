@@ -1,0 +1,68 @@
+import React, { createContext, useContext } from 'react';
+
+export interface ClinicConfig {
+  name: string;
+  tagline: string;
+  address: string;
+  landmark: string;
+  cityStatePincode: string;
+  phone: string;
+  mobile: string;
+  emergencyHotline: string;
+  email: string;
+  googleMapsUrl: string;
+  doctorWhatsapp: string;
+  receptionistWhatsapp: string;
+  hours: {
+    weekdaysMorning: string;
+    weekdaysEvening: string;
+    saturday: string;
+    sunday: string;
+    urgentCare: string;
+  };
+  consultationFee: number;
+  accreditation: string[];
+}
+
+export const CLINIC_CONFIG: ClinicConfig = {
+  name: "Dr. Shilpa's Mother Care Speciality Clinic",
+  tagline: 'Dedicated Maternity, Obstetrics, Gynaecology & Infertility Care',
+  address: 'Shettihalli Main Rd, Dasappa Garden',
+  landmark: 'Near Dasappa Garden Junction',
+  cityStatePincode: 'Tumakuru, Karnataka 572102',
+  phone: '0816 225 8890',
+  mobile: '+91 98450 12345',
+  emergencyHotline: '+91 98450 99999 / 108 Emergency',
+  email: 'care@drshilpamothercare.in',
+  googleMapsUrl: 'https://maps.app.goo.gl/VXiQtJ3etaJ2tbB1A',
+  doctorWhatsapp: '+91 98450 12345',
+  receptionistWhatsapp: '+91 99001 88776',
+  hours: {
+    weekdaysMorning: '9:30 AM – 1:30 PM',
+    weekdaysEvening: '5:00 PM – 8:30 PM',
+    saturday: '9:30 AM – 1:30 PM & 5:00 PM – 8:30 PM',
+    sunday: '10:00 AM – 1:00 PM (Prior Appointment)',
+    urgentCare: '24/7 On-Call Obstetric & Emergency Support'
+  },
+  consultationFee: 400,
+  accreditation: [
+    'Board Certified Obstetrician & Gynaecologist',
+    'Advanced Fetal Medicine & Scan Facility',
+    'Infertility & Reproductive Health Center',
+    'Premier Mother Care Specialist in Tumakuru'
+  ]
+};
+
+const ClinicConfigContext = createContext<ClinicConfig>(CLINIC_CONFIG);
+
+export const ClinicConfigProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => (
+  <ClinicConfigContext.Provider value={CLINIC_CONFIG}>{children}</ClinicConfigContext.Provider>
+);
+
+export const useClinicConfig = () => {
+  const context = useContext(ClinicConfigContext);
+  if (!context) {
+    throw new Error('useClinicConfig must be used within a ClinicConfigProvider');
+  }
+  return { config: context };
+};
