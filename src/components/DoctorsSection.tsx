@@ -27,7 +27,7 @@ export const DoctorsSection: React.FC<DoctorsSectionProps> = ({ onSelectDoctor }
             Board-certified specialty care team
           </h2>
           <p className="text-slate-600 text-sm sm:text-base leading-relaxed">
-            Led by Dr. Shilpa, MS (OBG), our dedicated maternity and women&apos;s health specialists are committed to warm, evidence-based care.
+            Led by Dr. Shilpa Rani G R, MS (OBG), DNB (OBG) — warm, evidence-based maternity and women&apos;s health care.
           </p>
         </div>
 
@@ -80,8 +80,11 @@ export const DoctorsSection: React.FC<DoctorsSectionProps> = ({ onSelectDoctor }
                 <h3 className="text-2xl sm:text-3xl font-extrabold text-slate-900">
                   {selectedDoc.name}
                 </h3>
-                <p className="text-xs font-bold text-pink-800 mt-0.5">
-                  {selectedDoc.title} • {selectedDoc.qualification}
+                <p className="text-sm font-bold text-pink-900 mt-1">
+                  {selectedDoc.qualification}
+                </p>
+                <p className="text-xs font-semibold text-pink-800 mt-0.5">
+                  {selectedDoc.title}
                 </p>
               </div>
 

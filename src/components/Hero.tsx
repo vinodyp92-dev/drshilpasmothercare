@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { Calendar, ChevronLeft, ChevronRight, Sparkles } from 'lucide-react';
-import { useClinicConfig } from '../context/ClinicConfigContext';
+import { ClinicBrandTitle } from './ClinicBrandTitle';
 
 interface HeroProps {
   onOpenBooking: (doctorId?: string, serviceId?: string) => void;
@@ -34,7 +34,6 @@ const HERO_SLIDES = [
 ] as const;
 
 export const Hero: React.FC<HeroProps> = ({ onOpenBooking, onNavigate }) => {
-  const { config } = useClinicConfig();
   const [active, setActive] = useState(0);
   const [paused, setPaused] = useState(false);
   const total = HERO_SLIDES.length;
@@ -101,17 +100,11 @@ export const Hero: React.FC<HeroProps> = ({ onOpenBooking, onNavigate }) => {
 
         <div className="relative z-[3] max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 min-h-[min(88vh,820px)] flex flex-col justify-center py-20 sm:py-24 pb-28">
           <div className="max-w-2xl space-y-6 hero-enter">
-            <p className="text-[11px] sm:text-xs font-bold uppercase tracking-[0.2em] text-pink-200/95">
-              {config.name}
-            </p>
-
-            <h1 className="font-aesthetic text-4xl sm:text-5xl lg:text-6xl font-bold tracking-tight leading-[1.08] text-balance text-white">
-              Your journey to parenthood begins here
-            </h1>
+            <ClinicBrandTitle variant="hero" />
 
             <p className="text-sm sm:text-base text-slate-200/90 max-w-xl leading-relaxed">
               Expert obstetric, gynaecology, infertility and antenatal care in Tumakuru —
-              led by Dr. Shilpa, MS (OBG).
+              led by Dr. Shilpa Rani G R, MS (OBG), DNB (OBG).
             </p>
 
             <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 pt-2">

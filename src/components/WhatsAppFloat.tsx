@@ -26,6 +26,16 @@ export const WhatsAppFloat: React.FC<WhatsAppFloatProps> = ({ onOpenBooking }) =
 
   return (
     <div className="fixed bottom-5 right-5 z-40 flex flex-col items-end gap-3">
+
+      {/* Floating call — above WhatsApp */}
+      <a
+        href={`tel:${config.mobile.replace(/[^0-9+]/g, '')}`}
+        className="w-14 h-14 rounded-full bg-gradient-to-br from-pink-600 to-rose-600 hover:from-pink-700 hover:to-rose-700 text-white shadow-[0_12px_30px_-8px_rgb(219_39_119_/_0.55)] flex items-center justify-center transition-all border-2 border-white/90 hover:-translate-y-0.5 active:translate-y-0"
+        aria-label={`Call clinic at ${config.mobile}`}
+        title={`Call ${config.mobile}`}
+      >
+        <Phone className="w-6 h-6" />
+      </a>
       
       {/* Expanded Quick Options Menu */}
       {isOpen && (
@@ -53,7 +63,7 @@ export const WhatsAppFloat: React.FC<WhatsAppFloatProps> = ({ onOpenBooking }) =
           </div>
 
           <p className="text-[11px] text-slate-600 font-medium leading-relaxed bg-emerald-50/60 p-2.5 rounded-xl border border-emerald-100">
-            Welcome to Mother & Child Speciality Clinic, Tumakuru! How can our reception team assist you today?
+            Welcome to Dr. Shilpa&apos;s MOTHER CARE, Tumakuru! How can our reception team assist you today?
           </p>
 
           <div className="p-2 bg-emerald-50 rounded-xl border border-emerald-200/80 text-[10px] text-emerald-800 font-semibold flex items-center gap-1.5">
@@ -98,12 +108,23 @@ export const WhatsAppFloat: React.FC<WhatsAppFloatProps> = ({ onOpenBooking }) =
 
             {/* Direct Call */}
             <a
+              href={`tel:${config.mobile.replace(/[^0-9+]/g, '')}`}
+              className="w-full p-2.5 bg-slate-50 hover:bg-slate-100 text-slate-800 font-bold text-xs rounded-xl border border-slate-200 transition-all flex items-center justify-between cursor-pointer group"
+            >
+              <span className="flex items-center gap-2">
+                <Phone className="w-4 h-4 text-pink-600" />
+                <span>Call: {config.mobile}</span>
+              </span>
+              <ChevronRight className="w-4 h-4 text-slate-500 group-hover:translate-x-0.5 transition-transform" />
+            </a>
+
+            <a
               href={`tel:${config.phone.replace(/[^0-9+]/g, '')}`}
               className="w-full p-2.5 bg-slate-50 hover:bg-slate-100 text-slate-800 font-bold text-xs rounded-xl border border-slate-200 transition-all flex items-center justify-between cursor-pointer group"
             >
               <span className="flex items-center gap-2">
                 <Phone className="w-4 h-4 text-pink-600" />
-                <span>Call Desk: {config.phone}</span>
+                <span>Landline: {config.phone}</span>
               </span>
               <ChevronRight className="w-4 h-4 text-slate-500 group-hover:translate-x-0.5 transition-transform" />
             </a>

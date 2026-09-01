@@ -4,11 +4,14 @@ import { CONSULTATION_HOURS_DISPLAY } from '../utils/clinicHours';
 export interface ClinicConfig {
   name: string;
   tagline: string;
+  taglineSanskrit: string;
+  taglineEnglish: string;
   address: string;
   landmark: string;
   cityStatePincode: string;
   phone: string;
   mobile: string;
+  mobileAlt: string;
   emergencyHotline: string;
   email: string;
   googleMapsUrl: string;
@@ -26,18 +29,21 @@ export interface ClinicConfig {
 }
 
 export const CLINIC_CONFIG: ClinicConfig = {
-  name: "Dr. Shilpa's Mother Care Speciality Clinic",
-  tagline: 'Dedicated Maternity, Obstetrics, Gynaecology & Infertility Care',
+  name: "Dr. Shilpa's MOTHER CARE",
+  tagline: 'मातृरक्षणं परमो धर्मः',
+  taglineSanskrit: 'मातृरक्षणं परमो धर्मः',
+  taglineEnglish: 'The protection of mothers is our supreme duty.',
   address: 'Shettihalli Main Rd, Dasappa Garden',
   landmark: 'Near Dasappa Garden Junction',
   cityStatePincode: 'Tumakuru, Karnataka 572102',
-  phone: '0816 225 8890',
-  mobile: '+91 98450 12345',
-  emergencyHotline: '+91 98450 99999 / 108 Emergency',
+  phone: '0816 4052517',
+  mobile: '9900047256',
+  mobileAlt: '9743033256',
+  emergencyHotline: '9900047256 / 9743033256',
   email: 'care@drshilpamothercare.in',
   googleMapsUrl: 'https://maps.app.goo.gl/VXiQtJ3etaJ2tbB1A',
-  doctorWhatsapp: '+91 98450 12345',
-  receptionistWhatsapp: '+91 99001 88776',
+  doctorWhatsapp: '9743033256',
+  receptionistWhatsapp: '9900047256',
   hours: {
     weekdays: CONSULTATION_HOURS_DISPLAY.weekdays,
     saturday: CONSULTATION_HOURS_DISPLAY.saturday,
@@ -48,7 +54,7 @@ export const CLINIC_CONFIG: ClinicConfig = {
   consultationFee: 400,
   accreditation: [
     'Board Certified Obstetrician & Gynaecologist',
-    'Advanced Fetal Medicine & Scan Facility',
+    'DNB (OBG) & Advanced Fetal Medicine',
     'Infertility & Reproductive Health Center',
     'Premier Mother Care Specialist in Tumakuru'
   ]

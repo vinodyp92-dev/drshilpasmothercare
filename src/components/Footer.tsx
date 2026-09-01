@@ -2,6 +2,7 @@ import React from 'react';
 import { AlertTriangle, Phone, Mail, MapPin, ShieldCheck, MessageCircle } from 'lucide-react';
 import { useClinicConfig } from '../context/ClinicConfigContext';
 import { ClinicLogo } from './ClinicLogo';
+import { ClinicBrandTitle } from './ClinicBrandTitle';
 
 interface FooterProps {
   onNavigate: (sectionId: string) => void;
@@ -43,14 +44,7 @@ export const Footer: React.FC<FooterProps> = ({ onNavigate, onOpenEmergency }) =
           <div className="lg:col-span-2 space-y-4">
             <div className="flex items-center gap-3.5">
               <ClinicLogo size="md" className="w-12 h-12 sm:w-14 sm:h-14 flex-shrink-0" />
-              <div>
-                <span className="font-aesthetic text-lg sm:text-xl lg:text-2xl font-extrabold text-white block leading-tight">
-                  {config.name}
-                </span>
-                <span className="text-[10px] sm:text-[11px] font-bold text-pink-400 tracking-wider uppercase block mt-0.5 font-sans-body">
-                  {config.tagline}
-                </span>
-              </div>
+              <ClinicBrandTitle variant="footer" />
             </div>
 
             <p className="text-xs text-slate-400 leading-relaxed max-w-sm">
@@ -64,7 +58,7 @@ export const Footer: React.FC<FooterProps> = ({ onNavigate, onOpenEmergency }) =
               </div>
               <div className="flex items-center gap-2">
                 <Phone className="w-4 h-4 text-pink-400 flex-shrink-0" />
-                <span>Phone: {config.phone} | Mobile: {config.mobile}</span>
+                <span>Phone: {config.phone} | {config.mobile} | {config.mobileAlt}</span>
               </div>
             </div>
 

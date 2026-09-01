@@ -1,0 +1,70 @@
+import React from 'react';
+
+type ClinicBrandTitleProps = {
+  variant?: 'header' | 'footer' | 'hero';
+  className?: string;
+  showTagline?: boolean;
+};
+
+export const ClinicBrandTitle: React.FC<ClinicBrandTitleProps> = ({
+  variant = 'header',
+  className = '',
+  showTagline = true
+}) => {
+  if (variant === 'hero') {
+    return (
+      <div className={`space-y-3 ${className}`}>
+        <p className="text-[11px] sm:text-xs font-bold uppercase tracking-[0.22em] text-pink-200/95">
+          <span className="font-aesthetic normal-case tracking-tight text-base sm:text-lg text-white">
+            Dr. Shilpa&apos;s{' '}
+          </span>
+          <span className="text-pink-300">MOTHER CARE</span>
+        </p>
+        {showTagline && (
+          <>
+            <p className="font-aesthetic text-2xl sm:text-3xl lg:text-4xl text-pink-100/95 leading-snug">
+              मातृरक्षणं परमो धर्मः
+            </p>
+            <p className="text-sm sm:text-base text-slate-200/90 italic max-w-xl leading-relaxed">
+              The protection of mothers is our supreme duty.
+            </p>
+          </>
+        )}
+      </div>
+    );
+  }
+
+  if (variant === 'footer') {
+    return (
+      <div className={className}>
+        <span className="font-aesthetic text-lg sm:text-xl font-semibold text-pink-100 block leading-tight">
+          Dr. Shilpa&apos;s
+        </span>
+        <span className="font-aesthetic text-xl sm:text-2xl font-extrabold text-white tracking-wide block leading-none mt-0.5">
+          MOTHER CARE
+        </span>
+        {showTagline && (
+          <span className="text-[10px] sm:text-[11px] text-pink-300/90 font-medium block mt-2 leading-relaxed font-sans-body normal-case tracking-normal">
+            मातृरक्षणं परमो धर्मः · The protection of mothers is our supreme duty.
+          </span>
+        )}
+      </div>
+    );
+  }
+
+  return (
+    <div className={`min-w-0 ${className}`}>
+      <span className="font-aesthetic text-base sm:text-lg font-semibold text-slate-800 block leading-tight group-hover:text-pink-800 transition-colors">
+        Dr. Shilpa&apos;s
+      </span>
+      <span className="font-aesthetic text-lg sm:text-xl lg:text-2xl font-extrabold text-pink-700 tracking-wide block leading-none">
+        MOTHER CARE
+      </span>
+      {showTagline && (
+        <span className="text-[9px] sm:text-[10px] text-pink-800/80 font-medium block mt-1.5 leading-snug font-sans-body normal-case tracking-normal line-clamp-2">
+          मातृरक्षणं परमो धर्मः
+        </span>
+      )}
+    </div>
+  );
+};

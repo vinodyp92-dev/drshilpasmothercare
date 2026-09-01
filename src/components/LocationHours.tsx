@@ -92,8 +92,12 @@ export const LocationHours: React.FC = () => {
                   <a href={`tel:${config.phone}`} className="font-bold text-pink-700 hover:underline">{config.phone}</a>
                 </div>
                 <div className="flex justify-between py-1 border-b border-slate-100">
-                  <span className="text-slate-500 font-medium">Mobile / WhatsApp Booking:</span>
+                  <span className="text-slate-500 font-medium">Mobile / WhatsApp:</span>
                   <a href={`tel:${config.mobile}`} className="font-bold text-pink-700 hover:underline">{config.mobile}</a>
+                </div>
+                <div className="flex justify-between py-1 border-b border-slate-100">
+                  <span className="text-slate-500 font-medium">Alternate mobile:</span>
+                  <a href={`tel:${config.mobileAlt}`} className="font-bold text-pink-700 hover:underline">{config.mobileAlt}</a>
                 </div>
                 <div className="flex justify-between py-1 border-b border-slate-100">
                   <span className="text-slate-500 font-medium">Emergency Line:</span>

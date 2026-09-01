@@ -3,6 +3,7 @@ import { Phone, MapPin, AlertCircle, Calendar, Menu, X } from 'lucide-react';
 import { useClinicConfig } from '../context/ClinicConfigContext';
 import { isClinicOpenNow } from '../utils/clinicHours';
 import { ClinicLogo } from './ClinicLogo';
+import { ClinicBrandTitle } from './ClinicBrandTitle';
 
 interface HeaderProps {
   onOpenBooking: (doctorId?: string, serviceId?: string) => void;
@@ -96,14 +97,7 @@ export const Header: React.FC<HeaderProps> = ({
             className="flex items-center gap-3.5 text-left cursor-pointer group min-w-0"
           >
             <ClinicLogo size="md" className="w-12 h-12 sm:w-14 sm:h-14 lg:w-16 lg:h-16 flex-shrink-0" />
-            <div className="min-w-0">
-              <span className="font-aesthetic text-lg sm:text-xl lg:text-2xl font-bold tracking-tight text-slate-900 block leading-tight group-hover:text-pink-700 transition-colors truncate">
-                {config.name}
-              </span>
-              <span className="text-[10px] sm:text-[11px] font-bold text-pink-800 tracking-wider block uppercase mt-0.5 font-sans-body truncate">
-                {config.tagline}
-              </span>
-            </div>
+            <ClinicBrandTitle />
           </button>
 
           <div className="flex items-center gap-2.5">

@@ -7,13 +7,14 @@ import {
 } from '../utils/clinicHours';
 
 export const CLINIC_INFO = {
-  name: "Dr. Shilpa's Mother Care Speciality Clinic",
-  tagline: 'Specialized Maternity, Obstetrics, Gynaecology & Infertility Care',
+  name: "Dr. Shilpa's MOTHER CARE",
+  tagline: 'मातृरक्षणं परमो धर्मः — The protection of mothers is our supreme duty.',
   address: 'Shettihalli Main Rd, Dasappa Garden, Tumakuru, Karnataka 572102',
   landmark: 'Near Dasappa Garden Junction',
-  phone: '0816 225 8890',
-  mobile: '+91 98450 12345',
-  emergencyHotline: '+91 98450 99999 / 108 Emergency',
+  phone: '0816 4052517',
+  mobile: '9900047256',
+  mobileAlt: '9743033256',
+  emergencyHotline: '9900047256 / 9743033256',
   email: 'care@drshilpamothercare.in',
   hours: {
     weekdays: CONSULTATION_HOURS_DISPLAY.weekdays,
@@ -32,22 +33,22 @@ export const CLINIC_INFO = {
 export const DOCTORS_DATA: Doctor[] = [
   {
     id: 'doc-shilpa',
-    name: 'Dr. Shilpa Rani G R, MBBS, MS (OBG), FRM',
+    name: 'Dr. Shilpa Rani G R',
     title: 'Chief Obstetrician, Gynecologist & Infertility Specialist',
     department: 'Women\'s Health & OB/GYN',
-    qualification: 'MBBS, MS in Obstetrics & Gynaecology',
-    experienceYears: 16,
+    qualification: 'MBBS, MS (OBG), DNB (OBG), FRM',
+    experienceYears: 15,
     rating: 4.98,
     reviewCount: 250,
     languages: ['Kannada', 'English', 'Hindi'],
     imageUrl: drShilpaImg,
-    bio: 'Dr. Shilpa is a renowned Obstetrician and Gynecologist with over 16 years of expertise in high-risk pregnancies, infertility treatments, laparoscopic procedures, and holistic women health care. Founder of Mother Care Speciality Clinic in Tumakuru.',
+    bio: 'Dr. Shilpa Rani G R is an Obstetrician and Gynaecologist at Mother Care Speciality Clinic and has an experience of 15+ years in this field.',
     specialties: ['High Risk Pregnancy Management', 'Infertility Evaluation & IUI', 'Antenatal & Postnatal Care', 'PCOS & Hormonal Care', 'Laparoscopic Gynaecology'],
     consultationFee: 400,
     availableDays: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'],
     timeSlots: [...DOCTOR_TIME_SLOTS.shilpa],
     acceptingNewPatients: true,
-    education: 'MS (OBG) Bangalore Medical College, MBBS Mysore Medical College',
+    education: 'DNB (OBG), MS (OBG) Bangalore Medical College, MBBS Mysore Medical College',
     location: 'Mother Care Speciality Clinic - Main Consultation Suite'
   },
   {
@@ -312,7 +313,7 @@ export const PATIENT_REVIEWS_DATA: PatientReview[] = [
 export const FAQS_DATA = [
   {
     question: 'How do I book an appointment with Dr. Shilpa?',
-    answer: 'Fill in your name, phone, and preferred date in the booking form on this site — it opens WhatsApp with your details ready to send. Reception will confirm your slot. You can also call or WhatsApp us directly at 0816 225 8890 / +91 98450 12345.'
+    answer: 'Fill in your name, phone, and preferred date in the booking form on this site — it opens WhatsApp with your details ready to send. Reception will confirm your slot. You can also call or WhatsApp us at 0816 4052517 / 9900047256 / 9743033256.'
   },
   {
     question: 'What are the clinic consultation timings?',
@@ -320,7 +321,7 @@ export const FAQS_DATA = [
   },
   {
     question: 'Where is the clinic located in Tumakuru?',
-    answer: 'Dr. Shilpa\'s Mother Care Speciality Clinic is located on Shettihalli Main Road, near Dasappa Garden Junction, Tumakuru, Karnataka 572102.'
+    answer: 'Dr. Shilpa\'s MOTHER CARE is located on Shettihalli Main Road, near Dasappa Garden Junction, Tumakuru, Karnataka 572102.'
   },
   {
     question: 'Are ultrasound scan facilities available on-site?',
