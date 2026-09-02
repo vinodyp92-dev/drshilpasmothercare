@@ -3,6 +3,8 @@ import { CONSULTATION_HOURS_DISPLAY } from '../utils/clinicHours';
 
 export interface ClinicConfig {
   name: string;
+  brandPrefix: string;
+  brandAccent: string;
   tagline: string;
   taglineSanskrit: string;
   taglineEnglish: string;
@@ -24,12 +26,13 @@ export interface ClinicConfig {
     festivalNotice: string;
     urgentCare: string;
   };
-  consultationFee: number;
   accreditation: string[];
 }
 
 export const CLINIC_CONFIG: ClinicConfig = {
   name: "Dr. Shilpa's MOTHER CARE",
+  brandPrefix: "Dr. Shilpa's",
+  brandAccent: 'MOTHER CARE',
   tagline: 'मातृरक्षणं परमो धर्मः',
   taglineSanskrit: 'मातृरक्षणं परमो धर्मः',
   taglineEnglish: 'The protection of mothers is our supreme duty.',
@@ -51,11 +54,10 @@ export const CLINIC_CONFIG: ClinicConfig = {
     festivalNotice: CONSULTATION_HOURS_DISPLAY.festivalNotice,
     urgentCare: CONSULTATION_HOURS_DISPLAY.urgentCare
   },
-  consultationFee: 400,
   accreditation: [
     'Board Certified Obstetrician & Gynaecologist',
     'DNB (OBG) & Advanced Fetal Medicine',
-    'Infertility & Reproductive Health Center',
+    'Fertility & Reproductive Health Center',
     'Premier Mother Care Specialist in Tumakuru'
   ]
 };

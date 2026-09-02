@@ -1,10 +1,11 @@
 import React, { useState } from 'react';
 import { MapPin, Phone, Mail, Clock, Navigation, ChevronDown, ChevronUp, Building2, Settings, Car, ShieldCheck, Lock } from 'lucide-react';
-import { FAQS_DATA } from '../data/clinicData';
+import { getClinicFaqs } from '../utils/faq';
 import { useClinicConfig } from '../context/ClinicConfigContext';
 
 export const LocationHours: React.FC = () => {
   const { config } = useClinicConfig();
+  const faqs = getClinicFaqs(config);
   const [openFaq, setOpenFaq] = useState<number | null>(0);
 
   const toggleFaq = (idx: number) => {
@@ -167,7 +168,7 @@ export const LocationHours: React.FC = () => {
               <h3 className="text-lg font-extrabold text-slate-900">Patient FAQs</h3>
               
               <div className="space-y-2">
-                {FAQS_DATA.map((faq, idx) => (
+                {faqs.map((faq, idx) => (
                   <div key={idx} className="bg-pink-50/40 rounded-2xl border border-pink-200/80 overflow-hidden">
                     <button
                       onClick={() => toggleFaq(idx)}

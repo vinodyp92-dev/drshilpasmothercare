@@ -103,7 +103,7 @@ export const Hero: React.FC<HeroProps> = ({ onOpenBooking, onNavigate }) => {
             <ClinicBrandTitle variant="hero" />
 
             <p className="text-sm sm:text-base text-slate-200/90 max-w-xl leading-relaxed">
-              Expert obstetric, gynaecology, infertility and antenatal care in Tumakuru —
+              Expert obstetric, gynaecology, Fertility and antenatal care in Tumakuru —
               led by Dr. Shilpa Rani G R, MS (OBG), DNB (OBG).
             </p>
 

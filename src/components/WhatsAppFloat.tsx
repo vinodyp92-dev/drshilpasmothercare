@@ -1,6 +1,8 @@
 import React, { useState } from 'react';
 import { MessageCircle, Phone, Calendar, X, Heart, ShieldCheck, ChevronRight } from 'lucide-react';
 import { useClinicConfig } from '../context/ClinicConfigContext';
+import { formatWhatsappNumber } from '../utils/whatsapp';
+import { formatTelHref } from '../utils/phone';
 
 interface WhatsAppFloatProps {
   onOpenBooking: () => void;
@@ -10,15 +12,8 @@ export const WhatsAppFloat: React.FC<WhatsAppFloatProps> = ({ onOpenBooking }) =
   const { config } = useClinicConfig();
   const [isOpen, setIsOpen] = useState(false);
 
-  // Helper to clean phone numbers for WhatsApp API links
-  const formatWhatsappNum = (numStr?: string) => {
-    if (!numStr) return '';
-    const raw = numStr.replace(/[^0-9]/g, '');
-    return raw.length === 10 ? `91${raw}` : raw;
-  };
-
-  const recepNum = formatWhatsappNum(config.receptionistWhatsapp || config.mobile);
-  const docNum = formatWhatsappNum(config.doctorWhatsapp || config.mobile);
+  const recepNum = formatWhatsappNumber(config.receptionistWhatsapp || config.mobile);
+  const docNum = formatWhatsappNumber(config.doctorWhatsapp || config.mobile);
 
   const defaultMsg = encodeURIComponent(
     `Hello ${config.name}, I would like to inquire about OPD consultation timings & book an appointment.`
@@ -29,7 +24,7 @@ export const WhatsAppFloat: React.FC<WhatsAppFloatProps> = ({ onOpenBooking }) =
 
       {/* Floating call — above WhatsApp */}
       <a
-        href={`tel:${config.mobile.replace(/[^0-9+]/g, '')}`}
+        href={formatTelHref(config.mobile)}
         className="w-14 h-14 rounded-full bg-gradient-to-br from-pink-600 to-rose-600 hover:from-pink-700 hover:to-rose-700 text-white shadow-[0_12px_30px_-8px_rgb(219_39_119_/_0.55)] flex items-center justify-center transition-all border-2 border-white/90 hover:-translate-y-0.5 active:translate-y-0"
         aria-label={`Call clinic at ${config.mobile}`}
         title={`Call ${config.mobile}`}
@@ -108,7 +103,7 @@ export const WhatsAppFloat: React.FC<WhatsAppFloatProps> = ({ onOpenBooking }) =
 
             {/* Direct Call */}
             <a
-              href={`tel:${config.mobile.replace(/[^0-9+]/g, '')}`}
+              href={formatTelHref(config.mobile)}
               className="w-full p-2.5 bg-slate-50 hover:bg-slate-100 text-slate-800 font-bold text-xs rounded-xl border border-slate-200 transition-all flex items-center justify-between cursor-pointer group"
             >
               <span className="flex items-center gap-2">
@@ -119,7 +114,7 @@ export const WhatsAppFloat: React.FC<WhatsAppFloatProps> = ({ onOpenBooking }) =
             </a>
 
             <a
-              href={`tel:${config.phone.replace(/[^0-9+]/g, '')}`}
+              href={formatTelHref(config.phone)}
               className="w-full p-2.5 bg-slate-50 hover:bg-slate-100 text-slate-800 font-bold text-xs rounded-xl border border-slate-200 transition-all flex items-center justify-between cursor-pointer group"
             >
               <span className="flex items-center gap-2">

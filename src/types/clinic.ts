@@ -25,7 +25,6 @@ export interface Doctor {
   specialties: string[];
   consultationFee: number;
   availableDays: string[]; // e.g. ['Mon', 'Tue', 'Wed', 'Thu', 'Fri']
-  timeSlots: string[]; // e.g. ['09:00 AM', '10:30 AM', '02:00 PM', '03:30 PM']
   acceptingNewPatients: boolean;
   education: string;
   location: string;
@@ -48,16 +47,6 @@ export interface MedicalService {
 export interface TimeSlot {
   time: string;
   available: boolean;
-}
-
-export interface InsuranceProvider {
-  id: string;
-  name: string;
-  category: 'Commercial' | 'Government' | 'Medicare/Medicaid' | 'International';
-  status: 'In-Network' | 'Out-of-Network' | 'Prior Authorization Required';
-  copayEstimate: string;
-  popularPlans: string[];
-  logoText: string;
 }
 
 export interface PatientReview {

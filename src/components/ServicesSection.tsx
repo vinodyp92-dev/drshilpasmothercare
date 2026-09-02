@@ -9,7 +9,7 @@ interface ServicesSectionProps {
 
 export const ServicesSection: React.FC<ServicesSectionProps> = ({ onSelectService }) => {
   const [selectedServiceId, setSelectedServiceId] = useState<string>(SERVICES_DATA[0].id);
-  const [categoryFilter, setCategoryFilter] = useState<'All' | 'Maternity' | 'Gynecology' | 'Infertility'>('All');
+  const [categoryFilter, setCategoryFilter] = useState<'All' | 'Maternity' | 'Gynecology' | 'Fertility'>('All');
 
   const activeService = SERVICES_DATA.find(s => s.id === selectedServiceId) || SERVICES_DATA[0];
 
@@ -35,11 +35,11 @@ export const ServicesSection: React.FC<ServicesSectionProps> = ({ onSelectServic
     if (categoryFilter === 'Maternity') {
       return ['Pre-Pregnancy Counseling', 'Antenatal Checkup', 'High Risk Pregnancy'].includes(service.name);
     }
-    if (categoryFilter === 'Infertility') {
-      return ['Infertility Treatment', 'PCOS Management'].includes(service.name);
+    if (categoryFilter === 'Fertility') {
+      return ['Fertility Treatment', 'PCOS Management'].includes(service.name);
     }
     if (categoryFilter === 'Gynecology') {
-      return !['Pre-Pregnancy Counseling', 'Antenatal Checkup', 'High Risk Pregnancy', 'Infertility Treatment'].includes(service.name);
+      return !['Pre-Pregnancy Counseling', 'Antenatal Checkup', 'High Risk Pregnancy', 'Fertility Treatment'].includes(service.name);
     }
     return true;
   });
@@ -64,7 +64,7 @@ export const ServicesSection: React.FC<ServicesSectionProps> = ({ onSelectServic
 
         {/* Quick Category Filter Pills */}
         <div className="flex items-center justify-center gap-2 flex-wrap">
-          {(['All', 'Maternity', 'Infertility', 'Gynecology'] as const).map(cat => (
+          {(['All', 'Maternity', 'Fertility', 'Gynecology'] as const).map(cat => (
             <button
               key={cat}
               type="button"

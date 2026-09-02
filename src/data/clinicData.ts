@@ -1,40 +1,11 @@
-import { Doctor, MedicalService, InsuranceProvider, PatientReview } from '../types/clinic';
+import { Doctor, MedicalService, PatientReview } from '../types/clinic';
 import drShilpaImg from '../assets/images/dr_shilpa_official_1786535230073.jpg';
-import {
-  CONSULTATION_HOURS_DISPLAY,
-  DOCTOR_TIME_SLOTS,
-  getConsultationTimingsFaqAnswer
-} from '../utils/clinicHours';
-
-export const CLINIC_INFO = {
-  name: "Dr. Shilpa's MOTHER CARE",
-  tagline: 'मातृरक्षणं परमो धर्मः — The protection of mothers is our supreme duty.',
-  address: 'Shettihalli Main Rd, Dasappa Garden, Tumakuru, Karnataka 572102',
-  landmark: 'Near Dasappa Garden Junction',
-  phone: '0816 4052517',
-  mobile: '9900047256',
-  mobileAlt: '9743033256',
-  emergencyHotline: '9900047256 / 9743033256',
-  email: 'care@drshilpamothercare.in',
-  hours: {
-    weekdays: CONSULTATION_HOURS_DISPLAY.weekdays,
-    saturday: CONSULTATION_HOURS_DISPLAY.saturday,
-    sunday: CONSULTATION_HOURS_DISPLAY.sunday,
-    urgentCare: CONSULTATION_HOURS_DISPLAY.urgentCare
-  },
-  accreditation: [
-    'Board Certified Obstetrician & Gynaecologist',
-    'Advanced Fetal Ultrasound & Scan Center',
-    'Infertility & Reproductive Care Specialist',
-    'Premier Mother Care Specialist Facility in Tumakuru'
-  ]
-};
 
 export const DOCTORS_DATA: Doctor[] = [
   {
     id: 'doc-shilpa',
     name: 'Dr. Shilpa Rani G R',
-    title: 'Chief Obstetrician, Gynecologist & Infertility Specialist',
+    title: 'Chief Obstetrician, Gynecologist & Fertility Specialist',
     department: 'Women\'s Health & OB/GYN',
     qualification: 'MBBS, MS (OBG), DNB (OBG), FRM',
     experienceYears: 15,
@@ -43,10 +14,9 @@ export const DOCTORS_DATA: Doctor[] = [
     languages: ['Kannada', 'English', 'Hindi'],
     imageUrl: drShilpaImg,
     bio: 'Dr. Shilpa Rani G R is an Obstetrician and Gynaecologist at Mother Care Speciality Clinic and has an experience of 15+ years in this field.',
-    specialties: ['High Risk Pregnancy Management', 'Infertility Evaluation & IUI', 'Antenatal & Postnatal Care', 'PCOS & Hormonal Care', 'Laparoscopic Gynaecology'],
+    specialties: ['High Risk Pregnancy Management', 'Fertility Evaluation & IUI', 'Antenatal & Postnatal Care', 'PCOS & Hormonal Care', 'Laparoscopic Gynaecology'],
     consultationFee: 400,
     availableDays: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'],
-    timeSlots: [...DOCTOR_TIME_SLOTS.shilpa],
     acceptingNewPatients: true,
     education: 'DNB (OBG), MS (OBG) Bangalore Medical College, MBBS Mysore Medical College',
     location: 'Mother Care Speciality Clinic - Main Consultation Suite'
@@ -58,15 +28,14 @@ export const DOCTORS_DATA: Doctor[] = [
     department: 'General Medicine & Primary Care',
     qualification: 'MBBS, MD (General Medicine)',
     experienceYears: 14,
-    rating: 4.95,
-    reviewCount: 310,
+    rating: 4.8,
+    reviewCount: 150,
     languages: ['Kannada', 'English', 'Telugu'],
     imageUrl: 'https://images.unsplash.com/photo-1622253692010-333f2da6031d?auto=format&fit=crop&q=80&w=600',
     bio: 'Experienced family physician providing primary care, chronic disease management, preventive health checkups, and coordinated care for mothers and families at the clinic.',
     specialties: ['Primary Care Consultations', 'Hypertension & Diabetes Care', 'Preventive Health Screening', 'Family Wellness'],
     consultationFee: 350,
     availableDays: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'],
-    timeSlots: [...DOCTOR_TIME_SLOTS.sunil],
     acceptingNewPatients: true,
     education: 'MD General Medicine KIMS, MBBS Bangalore Medical College',
     location: 'Primary Care Suite - Room 2'
@@ -115,12 +84,12 @@ export const SERVICES_DATA: MedicalService[] = [
   },
   {
     id: 'serv-4',
-    name: 'Infertility Treatment',
+    name: 'Fertility Treatment',
     department: 'Women\'s Health & OB/GYN',
     iconName: 'Sparkles',
     shortDescription: 'Comprehensive fertility evaluation, follicular monitoring, hormonal profiling, and Intrauterine Insemination (IUI) guidance.',
     fullDescription: 'Compassionate and scientific fertility support for couples trying to conceive. Includes ovulation tracking via high-resolution ultrasound, tubal patency tests (HSG), semen analysis review, hormonal balancing, and IUI treatments.',
-    commonConditions: ['Anovulatory Infertility', 'Unexplained Infertility', 'Low Ovarian Reserve', 'Male Factor Subfertility'],
+    commonConditions: ['Anovulatory Fertility', 'Unexplained Fertility', 'Low Ovarian Reserve', 'Male Factor Subfertility'],
     procedures: ['Follicular Monitoring Scan', 'Hormonal Assay (AMH, FSH, LH)', 'Ovulation Induction', 'Intrauterine Insemination (IUI)'],
     durationMinutes: 35,
     priceEstimate: '₹400 - ₹1200 depending on scan series',
@@ -219,54 +188,6 @@ export const SERVICES_DATA: MedicalService[] = [
   }
 ];
 
-export const INSURANCE_PROVIDERS_DATA: InsuranceProvider[] = [
-  {
-    id: 'ins-1',
-    name: 'Star Health & Allied Insurance',
-    category: 'Commercial',
-    status: 'In-Network',
-    copayEstimate: 'Cashless Maternity & Surgical Benefits',
-    popularPlans: ['Star Women Care Insurance', 'Young Star Health Plan', 'Comprehensive Family Health'],
-    logoText: 'STAR HEALTH'
-  },
-  {
-    id: 'ins-2',
-    name: 'HDFC ERGO Health Insurance',
-    category: 'Commercial',
-    status: 'In-Network',
-    copayEstimate: 'Direct Cashless Claim Processing',
-    popularPlans: ['Optima Restore', 'My:Health Women Suraksha', 'Optima Secure'],
-    logoText: 'HDFC ERGO'
-  },
-  {
-    id: 'ins-3',
-    name: 'Niva Bupa Health Insurance',
-    category: 'Commercial',
-    status: 'In-Network',
-    copayEstimate: 'Cashless Admission Assistance',
-    popularPlans: ['ReAssure 2.0', 'Health Companion', 'Heartbeat Plan'],
-    logoText: 'NIVA BUPA'
-  },
-  {
-    id: 'ins-4',
-    name: 'Care Health Insurance (Religare)',
-    category: 'Commercial',
-    status: 'In-Network',
-    copayEstimate: 'Reimbursement & Cashless Support',
-    popularPlans: ['Care Advantage', 'Care Joy Maternity Plan', 'Care Supreme'],
-    logoText: 'CARE HEALTH'
-  },
-  {
-    id: 'ins-5',
-    name: 'Ayushman Bharat & Karnataka Govt Schemes',
-    category: 'Medicare/Medicaid',
-    status: 'In-Network',
-    copayEstimate: 'As per Govt Scheme Guidelines',
-    popularPlans: ['AB-ARK (Arogya Karnataka)', 'Yeshasvini Scheme'],
-    logoText: 'AYUSHMAN'
-  }
-];
-
 export const PATIENT_REVIEWS_DATA: PatientReview[] = [
   {
     id: 'rev-1',
@@ -282,10 +203,10 @@ export const PATIENT_REVIEWS_DATA: PatientReview[] = [
     id: 'rev-2',
     patientName: 'Kavitha R.',
     doctorName: 'Dr. Shilpa, MBBS, MS (OBG)',
-    department: 'Infertility Treatment',
+    department: 'Fertility Treatment',
     rating: 5,
     date: 'January 24, 2026',
-    comment: 'After 3 years of trying for a child, we visited Dr. Shilpa for infertility guidance. She diagnosed my PCOS accurately and started follicular tracking. We were blessed with positive news within 4 months!',
+    comment: 'After 3 years of trying for a child, we visited Dr. Shilpa for Fertility guidance. She diagnosed my PCOS accurately and started follicular tracking. We were blessed with positive news within 4 months!',
     verified: true
   },
   {
@@ -307,28 +228,5 @@ export const PATIENT_REVIEWS_DATA: PatientReview[] = [
     date: 'January 18, 2026',
     comment: 'Suffered from irregular periods for years. Dr. Shilpa recommended a sensible lifestyle plan along with mild medication. My cycles are regular now. Very thankful!',
     verified: true
-  }
-];
-
-export const FAQS_DATA = [
-  {
-    question: 'How do I book an appointment with Dr. Shilpa?',
-    answer: 'Fill in your name, phone, and preferred date in the booking form on this site — it opens WhatsApp with your details ready to send. Reception will confirm your slot. You can also call or WhatsApp us at 0816 4052517 / 9900047256 / 9743033256.'
-  },
-  {
-    question: 'What are the clinic consultation timings?',
-    answer: getConsultationTimingsFaqAnswer()
-  },
-  {
-    question: 'Where is the clinic located in Tumakuru?',
-    answer: 'Dr. Shilpa\'s MOTHER CARE is located on Shettihalli Main Road, near Dasappa Garden Junction, Tumakuru, Karnataka 572102.'
-  },
-  {
-    question: 'Are ultrasound scan facilities available on-site?',
-    answer: 'Yes! We have advanced ultrasound scan equipment for antenatal growth scans, anomaly scans, follicular monitoring, and pelvic ultrasound evaluation.'
-  },
-  {
-    question: 'Do you offer emergency obstetric care?',
-    answer: 'Yes, 24/7 emergency phone triage and emergency delivery support are available for registered mothers.'
   }
 ];

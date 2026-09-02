@@ -64,11 +64,6 @@ const generateSlotTimes = (windows: TimeWindow[], intervalMinutes = 45): string[
 
 export const BOOKING_TIME_PREFERENCES = generateSlotTimes([EVENING_CONSULTATION]);
 
-export const DOCTOR_TIME_SLOTS = {
-  shilpa: ['04:30 PM', '05:15 PM', '06:00 PM', '06:45 PM', '07:30 PM'],
-  sunil: ['04:30 PM', '05:15 PM', '06:00 PM', '06:45 PM']
-} as const;
-
 export const getConsultationTimingsFaqAnswer = () =>
   `Our regular clinic timings are Monday to Saturday: ${EVENING_HOURS} (evening consultation only; morning OPD is not offered at present). Sunday: ${CONSULTATION_HOURS_DISPLAY.sunday}. ${CONSULTATION_HOURS_DISPLAY.festivalNotice} To book, use the form on this site or message us on WhatsApp — reception will confirm your slot.`;
 

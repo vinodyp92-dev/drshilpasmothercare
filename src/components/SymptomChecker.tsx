@@ -20,7 +20,7 @@ export const SymptomChecker: React.FC<SymptomCheckerProps> = ({ onNavigateToBook
     { label: 'Routine Prenatal / Antenatal Checkup', category: 'Maternity', recommendedService: 'Antenatal Checkup', icon: '🤰' },
     { label: 'Decreased Fetal Movement or Abdominal Cramp', category: 'Obstetric Warning', recommendedService: 'High Risk Pregnancy', isRedFlag: true, icon: '👶' },
     { label: 'Irregular Periods / Missing Cycle', category: 'Menstrual', recommendedService: 'PCOS Management', icon: '📅' },
-    { label: 'Difficulty Conceiving / Trying for Baby', category: 'Fertility', recommendedService: 'Infertility Treatment', icon: '✨' },
+    { label: 'Difficulty Conceiving / Trying for Baby', category: 'Fertility', recommendedService: 'Fertility Treatment', icon: '✨' },
     { label: 'Painful Periods or Pelvic Pain', category: 'Gynaecological', recommendedService: 'Fibroids / Ovarian Cysts / Endometriosis Treatment', icon: '🌸' },
     { label: 'Pre-Conception Planning Guidance', category: 'Counseling', recommendedService: 'Pre-Pregnancy Counseling', icon: '💕' }
   ];

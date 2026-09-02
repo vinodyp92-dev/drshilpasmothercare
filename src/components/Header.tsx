@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Phone, MapPin, AlertCircle, Calendar, Menu, X } from 'lucide-react';
 import { useClinicConfig } from '../context/ClinicConfigContext';
 import { isClinicOpenNow } from '../utils/clinicHours';
+import { formatTelHref } from '../utils/phone';
 import { ClinicLogo } from './ClinicLogo';
 import { ClinicBrandTitle } from './ClinicBrandTitle';
 
@@ -76,7 +77,7 @@ export const Header: React.FC<HeaderProps> = ({
               <span>Maternity emergency</span>
             </button>
             <a
-              href={`tel:${config.phone.replace(/[^0-9+]/g, '')}`}
+              href={formatTelHref(config.phone)}
               className="flex items-center gap-1.5 text-slate-100 hover:text-white transition-colors font-bold text-xs"
             >
               <Phone className="w-3.5 h-3.5 text-pink-400" />

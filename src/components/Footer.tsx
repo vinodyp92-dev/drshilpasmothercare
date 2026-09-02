@@ -1,6 +1,7 @@
 import React from 'react';
 import { AlertTriangle, Phone, Mail, MapPin, ShieldCheck, MessageCircle } from 'lucide-react';
 import { useClinicConfig } from '../context/ClinicConfigContext';
+import { formatWhatsappNumber } from '../utils/whatsapp';
 import { ClinicLogo } from './ClinicLogo';
 import { ClinicBrandTitle } from './ClinicBrandTitle';
 
@@ -12,7 +13,7 @@ interface FooterProps {
 export const Footer: React.FC<FooterProps> = ({ onNavigate, onOpenEmergency }) => {
   const { config } = useClinicConfig();
 
-  const whatsappNumber = (config.receptionistWhatsapp || config.mobile || '').replace(/\D/g, '');
+  const whatsappNumber = formatWhatsappNumber(config.receptionistWhatsapp || config.mobile);
   const whatsappUrl = whatsappNumber
     ? `https://wa.me/${whatsappNumber}?text=${encodeURIComponent(`Hello, I would like to enquire about an appointment at ${config.name}.`)}`
     : `mailto:${config.email}`;
@@ -48,7 +49,7 @@ export const Footer: React.FC<FooterProps> = ({ onNavigate, onOpenEmergency }) =
             </div>
 
             <p className="text-xs text-slate-400 leading-relaxed max-w-sm">
-              Dedicated Obstetric, Gynaecology, High-Risk Pregnancy and Infertility Care center in Tumakuru, Karnataka. Led by Dr. Shilpa, MS (OBG).
+              Dedicated Obstetric, Gynaecology, High-Risk Pregnancy and Fertility Care center in Tumakuru, Karnataka. Led by Dr. Shilpa, MS (OBG).
             </p>
 
             <div className="text-xs text-slate-400 space-y-1 pt-1">
@@ -87,7 +88,7 @@ export const Footer: React.FC<FooterProps> = ({ onNavigate, onOpenEmergency }) =
               </li>
               <li>
                 <button onClick={() => onNavigate('services')} className="hover:text-pink-300 transition-colors">
-                  Infertility & Follicular Scan
+                  Fertility & Follicular Scan
                 </button>
               </li>
               <li>
