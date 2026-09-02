@@ -35,7 +35,7 @@ export const BookingSection: React.FC<BookingSectionProps> = ({
   const [preferredDate, setPreferredDate] = useState(
     new Date(Date.now() + 86400000).toISOString().split('T')[0]
   );
-  const [preferredTime, setPreferredTime] = useState('05:15 PM');
+  const [preferredTime, setPreferredTime] = useState('04:30 PM');
   const [patientName, setPatientName] = useState('');
   const [patientPhone, setPatientPhone] = useState('');
   const [reason, setReason] = useState('');

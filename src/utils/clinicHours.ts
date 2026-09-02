@@ -25,9 +25,9 @@ const formatSlotTime = (hour: number, minute: number) => {
   return `${hour12.toString().padStart(2, '0')}:${minute.toString().padStart(2, '0')} ${period}`;
 };
 
-const EVENING_CONSULTATION: TimeWindow = { start: { hour: 16, minute: 30 }, end: { hour: 20, minute: 30 } };
+const CLINIC_EVENING_CLOSE: TimeWindow = { start: { hour: 16, minute: 30 }, end: { hour: 20, minute: 30 } };
 
-const EVENING_HOURS = `${formatTime(16, 30)} – ${formatTime(20, 30)}`;
+const EVENING_HOURS = `${formatTime(16, 30)} – ${formatTime(20, 15)}`;
 
 export const CONSULTATION_HOURS_DISPLAY = {
   weekdays: `${EVENING_HOURS} (Evening consultation)`,
@@ -41,28 +41,26 @@ export const CONSULTATION_HOURS_DISPLAY = {
 const isWithinWindow = (nowMinutes: number, window: TimeWindow) =>
   nowMinutes >= toMinutes(window.start) && nowMinutes < toMinutes(window.end);
 
-const generateSlotTimes = (windows: TimeWindow[], intervalMinutes = 45): string[] => {
+const generateSlotTimes = (start: TimePoint, end: TimePoint, intervalMinutes = 15): string[] => {
   const slots: string[] = [];
-  const minimumSlotMinutes = 30;
+  let cursor = toMinutes(start);
+  const endMinutes = toMinutes(end);
 
-  for (const window of windows) {
-    let cursor = toMinutes(window.start);
-    const end = toMinutes(window.end);
-
-    while (cursor <= end) {
-      if (cursor + minimumSlotMinutes <= end) {
-        const hour = Math.floor(cursor / 60);
-        const minute = cursor % 60;
-        slots.push(formatSlotTime(hour, minute));
-      }
-      cursor += intervalMinutes;
-    }
+  while (cursor <= endMinutes) {
+    const hour = Math.floor(cursor / 60);
+    const minute = cursor % 60;
+    slots.push(formatSlotTime(hour, minute));
+    cursor += intervalMinutes;
   }
 
   return slots;
 };
 
-export const BOOKING_TIME_PREFERENCES = generateSlotTimes([EVENING_CONSULTATION]);
+export const BOOKING_TIME_PREFERENCES = generateSlotTimes(
+  { hour: 16, minute: 30 },
+  { hour: 20, minute: 15 },
+  15
+);
 
 export const getConsultationTimingsFaqAnswer = () =>
   `Our regular clinic timings are Monday to Saturday: ${EVENING_HOURS} (evening consultation only; morning OPD is not offered at present). Sunday: ${CONSULTATION_HOURS_DISPLAY.sunday}. ${CONSULTATION_HOURS_DISPLAY.festivalNotice} To book, use the form on this site or message us on WhatsApp — reception will confirm your slot.`;
@@ -76,7 +74,7 @@ export const isClinicOpenNow = (date = new Date()): boolean => {
   }
 
   if (day >= 1 && day <= 6) {
-    return isWithinWindow(nowMinutes, EVENING_CONSULTATION);
+    return isWithinWindow(nowMinutes, CLINIC_EVENING_CLOSE);
   }
 
   return false;
