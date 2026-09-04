@@ -1,7 +1,10 @@
 import React, { useState, useEffect } from 'react';
-import { Calendar, Menu, X } from 'lucide-react';
+import { MessageCircle, Menu, X } from 'lucide-react';
+import { useClinicConfig } from '../context/ClinicConfigContext';
+import { formatWhatsappNumber } from '../utils/whatsapp';
 import { ClinicLogo } from './ClinicLogo';
 import { ClinicBrandTitle } from './ClinicBrandTitle';
+import { CallNumbersMenu } from './CallNumbersMenu';
 
 interface HeaderProps {
   onOpenBooking: (doctorId?: string, serviceId?: string) => void;
@@ -14,6 +17,7 @@ export const Header: React.FC<HeaderProps> = ({
   onNavigate,
   activeSection
 }) => {
+  const { config } = useClinicConfig();
   const [isScrolled, setIsScrolled] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
@@ -33,6 +37,11 @@ export const Header: React.FC<HeaderProps> = ({
     { id: 'contact', label: 'Contact Us' }
   ];
 
+  const whatsappNumber = formatWhatsappNumber(config.receptionistWhatsapp || config.mobile);
+  const whatsappUrl = whatsappNumber
+    ? `https://wa.me/${whatsappNumber}?text=${encodeURIComponent(`Hello ${config.name}, I would like to book an appointment.`)}`
+    : undefined;
+
   return (
     <header className="sticky top-0 z-40 w-full">
       <div
@@ -50,19 +59,29 @@ export const Header: React.FC<HeaderProps> = ({
           </button>
 
           <div className="flex items-center gap-2.5">
-            <button
-              onClick={() => onOpenBooking()}
-              className="hidden sm:inline-flex px-3 py-1.5 text-xs font-bold text-slate-700 hover:text-slate-900 hover:bg-slate-100/80 rounded-xl transition-colors cursor-pointer"
-            >
-              WhatsApp booking
-            </button>
-            <button
-              onClick={() => onOpenBooking()}
-              className="btn-primary px-4 py-2 text-xs cursor-pointer"
-            >
-              <Calendar className="w-3.5 h-3.5" />
-              <span>Book visit</span>
-            </button>
+            {whatsappUrl ? (
+              <a
+                href={whatsappUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="hidden sm:inline-flex items-center gap-1.5 px-3 py-2 text-xs font-bold text-emerald-800 bg-emerald-50 hover:bg-emerald-100 border border-emerald-200 rounded-xl transition-colors"
+              >
+                <MessageCircle className="w-3.5 h-3.5" />
+                WhatsApp
+              </a>
+            ) : (
+              <button
+                onClick={() => onOpenBooking()}
+                className="hidden sm:inline-flex items-center gap-1.5 px-3 py-2 text-xs font-bold text-emerald-800 bg-emerald-50 hover:bg-emerald-100 border border-emerald-200 rounded-xl transition-colors cursor-pointer"
+              >
+                <MessageCircle className="w-3.5 h-3.5" />
+                WhatsApp
+              </button>
+            )}
+
+            <div className="hidden sm:block">
+              <CallNumbersMenu variant="header" />
+            </div>
 
             <button
               onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
@@ -120,15 +139,18 @@ export const Header: React.FC<HeaderProps> = ({
               ))}
             </nav>
             <div className="pt-3 border-t border-pink-100 flex flex-col gap-2">
-              <button
-                onClick={() => {
-                  onOpenBooking();
-                  setMobileMenuOpen(false);
-                }}
-                className="btn-primary w-full py-2.5 text-xs"
-              >
-                Book via WhatsApp
-              </button>
+              {whatsappUrl && (
+                <a
+                  href={whatsappUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="btn-primary w-full py-2.5 text-xs"
+                >
+                  <MessageCircle className="w-3.5 h-3.5" />
+                  Book via WhatsApp
+                </a>
+              )}
+              <CallNumbersMenu variant="mobile" />
             </div>
           </div>
         )}

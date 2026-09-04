@@ -21,10 +21,10 @@ export const DoctorsSection: React.FC<DoctorsSectionProps> = ({ onSelectDoctor }
         <div className="text-center max-w-3xl mx-auto space-y-3">
           <span className="section-eyebrow">
             <Heart className="w-3.5 h-3.5 fill-pink-600 text-pink-600" />
-            Meet Our Physicians
+            Know Our Doctors
           </span>
           <h2 className="font-aesthetic text-3xl sm:text-4xl font-bold text-slate-900 tracking-tight text-balance">
-            Board-certified specialty care team
+            Trusted specialists for mother &amp; baby care
           </h2>
           <p className="text-slate-600 text-sm sm:text-base leading-relaxed">
             Led by Dr. Shilpa Rani G R, MS (OBG), DNB (OBG) — warm, evidence-based maternity and women&apos;s health care.

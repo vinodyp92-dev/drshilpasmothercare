@@ -22,10 +22,13 @@ export const ClinicLogo: React.FC<ClinicLogoProps> = ({
   };
 
   const currentSizeClass = sizeClasses[size] || sizeClasses.md;
+  const isCircle = className.includes('rounded-full');
 
   return (
     <div 
-      className={`relative inline-flex items-center justify-center rounded-2xl overflow-hidden transition-all duration-200 group-hover:scale-105 ${
+      className={`relative inline-flex items-center justify-center overflow-hidden transition-all duration-200 group-hover:scale-105 ${
+        isCircle ? 'rounded-full' : 'rounded-2xl'
+      } ${
         showBadgeBackground 
           ? 'bg-white p-1 shadow-md shadow-pink-900/10 border-2 border-pink-200/90 ring-2 ring-pink-50' 
           : 'bg-white p-0.5 shadow-xs border border-pink-200'
@@ -34,8 +37,8 @@ export const ClinicLogo: React.FC<ClinicLogoProps> = ({
       {!hasError ? (
         <img
           src={clinicLogoImg}
-          alt="Mother & Child Speciality Clinic Logo"
-          className="w-full h-full object-contain rounded-xl"
+          alt="Dr. Shilpa's Mother Care logo"
+          className={`w-full h-full object-contain ${isCircle ? 'rounded-full' : 'rounded-xl'}`}
           onError={() => setHasError(true)}
         />
       ) : (
