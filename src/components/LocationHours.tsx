@@ -25,6 +25,12 @@ export const LocationHours: React.FC = () => {
           <h2 className="text-3xl sm:text-4xl font-extrabold text-slate-900 tracking-tight">
             Visit Our Clinic in Tumakuru
           </h2>
+          <p className="text-slate-800 text-sm sm:text-base font-semibold leading-relaxed flex flex-col sm:flex-row items-center justify-center gap-1.5 sm:gap-2">
+            <MapPin className="w-4 h-4 text-pink-600 flex-shrink-0" />
+            <span>
+              {config.address}, {config.landmark}, {config.cityStatePincode}
+            </span>
+          </p>
           <p className="text-slate-600 text-sm sm:text-base leading-relaxed">
             Conveniently located on Shettihalli Main Road with dedicated patient parking and comfortable facilities for expecting mothers.
           </p>
