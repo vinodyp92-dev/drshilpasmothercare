@@ -113,37 +113,30 @@ export const Hero: React.FC<HeroProps> = ({ onOpenBooking, onNavigate }) => {
 
         <div className="relative z-[3] max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 min-h-[min(90vh,860px)] flex flex-col justify-center py-16 sm:py-20 pb-28">
           <div className="w-full flex flex-col items-center text-center hero-enter">
-            {/* Circular logo + circular tagline arc fully below (no overlap) */}
+            {/* Tagline arc above (flipped 180°), then circular logo — no overlap */}
             <div className="relative flex flex-col items-center mb-4 sm:mb-6 w-full max-w-[440px]">
-              <div className="rounded-full p-2 sm:p-2.5 bg-white/90 shadow-[0_20px_50px_-20px_rgba(190,24,93,0.45)]">
-                <ClinicLogo
-                  size="xl"
-                  showBadgeBackground={false}
-                  className="!rounded-full !w-40 !h-40 sm:!w-48 sm:!h-48 lg:!w-52 lg:!h-52 !border-0 !shadow-none !ring-0 !p-1.5 bg-white"
-                />
-              </div>
-
               <svg
-                viewBox="0 0 440 230"
-                className="w-full max-w-[440px] h-auto mt-1 overflow-visible"
+                viewBox="0 0 440 200"
+                className="w-full max-w-[440px] h-auto mb-1 overflow-visible"
                 role="img"
                 aria-label={config.taglineTransliteration}
               >
                 <defs>
-                  {/* Circular smile under the logo — full bottom semicircle */}
+                  {/* Top semicircle — flipped 180° from previous bottom arc */}
                   <path
                     id="hero-tagline-arc"
-                    d="M 30 12 A 190 190 0 0 1 410 12"
+                    d="M 30 188 A 190 190 0 0 0 410 188"
                     fill="none"
                   />
                 </defs>
                 <text
                   fill="#9d174d"
                   style={{
-                    fontSize: '28px',
+                    fontSize: '26px',
                     fontWeight: 700,
-                    letterSpacing: '0.02em',
-                    fontFamily: 'Playfair Display, Georgia, serif'
+                    letterSpacing: '0.04em',
+                    fontFamily: 'Playfair Display, Georgia, serif',
+                    textTransform: 'uppercase'
                   }}
                 >
                   <textPath
@@ -152,20 +145,30 @@ export const Hero: React.FC<HeroProps> = ({ onOpenBooking, onNavigate }) => {
                     startOffset="50%"
                     textAnchor="middle"
                   >
-                    {config.taglineTransliteration}
+                    {config.taglineTransliteration.toUpperCase()}
                   </textPath>
                 </text>
               </svg>
+
+              <div className="rounded-full p-2 sm:p-2.5 bg-white/90 shadow-[0_20px_50px_-20px_rgba(190,24,93,0.45)]">
+                <ClinicLogo
+                  size="xl"
+                  showBadgeBackground={false}
+                  className="!rounded-full !w-40 !h-40 sm:!w-48 sm:!h-48 lg:!w-52 lg:!h-52 !border-0 !shadow-none !ring-0 !p-1.5 bg-white"
+                />
+              </div>
             </div>
 
-            <h1 className="font-aesthetic font-extrabold tracking-tight leading-[1.05] px-2 text-center">
-              <span className="block text-3xl sm:text-5xl lg:text-6xl text-pink-800">
-                {config.brandPrefix}
-              </span>
-              <span className="block text-4xl sm:text-6xl lg:text-7xl text-pink-600 mt-1">
-                {config.brandAccent}
-              </span>
-            </h1>
+            <div className="mx-auto inline-block text-left px-2">
+              <h1 className="font-aesthetic font-extrabold tracking-tight leading-[1.05]">
+                <span className="block text-3xl sm:text-5xl lg:text-6xl text-pink-800">
+                  {config.brandPrefix}
+                </span>
+                <span className="block text-4xl sm:text-6xl lg:text-7xl text-pink-600 mt-1">
+                  {config.brandAccent}
+                </span>
+              </h1>
+            </div>
 
             <p className="mt-4 text-sm sm:text-base text-slate-700/90 italic max-w-xl leading-relaxed px-4">
               {config.taglineEnglish}

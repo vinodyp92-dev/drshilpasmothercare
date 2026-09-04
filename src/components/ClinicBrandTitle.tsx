@@ -53,7 +53,7 @@ export const ClinicBrandTitle: React.FC<ClinicBrandTitleProps> = ({
   }
 
   return (
-    <div className={`min-w-0 ${className}`}>
+    <div className={`min-w-0 text-left ${className}`}>
       <span className="font-aesthetic text-lg sm:text-xl lg:text-2xl font-extrabold text-pink-800 block leading-tight group-hover:text-pink-900 transition-colors">
         {brandPrefix}
       </span>
