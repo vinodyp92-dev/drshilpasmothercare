@@ -150,7 +150,7 @@ export const Hero: React.FC<HeroProps> = ({ onOpenBooking, onNavigate }) => {
                 </text>
               </svg>
 
-              <div className="relative z-0 -mt-24 sm:-mt-28 lg:-mt-32 rounded-full p-2 sm:p-2.5 bg-white/90 shadow-[0_20px_50px_-20px_rgba(190,24,93,0.45)]">
+              <div className="relative z-0 -mt-[8.75rem] sm:-mt-[10.5rem] lg:-mt-[11.5rem] rounded-full p-2 sm:p-2.5 bg-white/90 shadow-[0_20px_50px_-20px_rgba(190,24,93,0.45)]">
                 <ClinicLogo
                   size="xl"
                   showBadgeBackground={false}
