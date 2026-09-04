@@ -159,7 +159,7 @@ export const Hero: React.FC<HeroProps> = ({ onOpenBooking, onNavigate }) => {
               </div>
             </div>
 
-            <div className="mx-auto inline-block text-left px-2 mt-6 sm:mt-8 lg:mt-10">
+            <div className="mx-auto inline-block text-left px-2 mt-14 sm:mt-20 lg:mt-24">
               <h1 className="font-aesthetic font-extrabold tracking-tight leading-[1.05]">
                 <span className="block text-3xl sm:text-5xl lg:text-6xl text-pink-800">
                   {config.brandPrefix}
