@@ -7,7 +7,6 @@ export interface ClinicConfig {
   brandAccent: string;
   tagline: string;
   taglineTransliteration: string;
-  taglineEnglish: string;
   address: string;
   landmark: string;
   cityStatePincode: string;
@@ -35,7 +34,6 @@ export const CLINIC_CONFIG: ClinicConfig = {
   brandAccent: 'MOTHER CARE',
   tagline: 'MATRU RAKSHANA PARAMO DHARMAH',
   taglineTransliteration: 'MATRU RAKSHANA PARAMO DHARMAH',
-  taglineEnglish: 'The protection of mothers is our supreme duty.',
   address: 'Shettihalli Main Rd, Dasappa Garden',
   landmark: 'Near Dasappa Garden Junction',
   cityStatePincode: 'Tumakuru, Karnataka 572102',

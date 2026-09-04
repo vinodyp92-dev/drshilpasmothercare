@@ -159,7 +159,7 @@ export const Hero: React.FC<HeroProps> = ({ onOpenBooking, onNavigate }) => {
               </div>
             </div>
 
-            <div className="mx-auto inline-block text-left px-2">
+            <div className="mx-auto inline-block text-left px-2 mt-6 sm:mt-8 lg:mt-10">
               <h1 className="font-aesthetic font-extrabold tracking-tight leading-[1.05]">
                 <span className="block text-3xl sm:text-5xl lg:text-6xl text-pink-800">
                   {config.brandPrefix}
@@ -170,13 +170,8 @@ export const Hero: React.FC<HeroProps> = ({ onOpenBooking, onNavigate }) => {
               </h1>
             </div>
 
-            <p className="mt-4 text-sm sm:text-base text-slate-700/90 italic max-w-xl leading-relaxed px-4">
-              {config.taglineEnglish}
-            </p>
-
-            <p className="mt-3 text-sm sm:text-base text-slate-600 max-w-xl leading-relaxed px-4">
-              Expert obstetric, gynaecology, fertility and antenatal care in Tumakuru —
-              led by Dr. Shilpa Rani G R, MS (OBG), DNB (OBG).
+            <p className="mt-4 text-sm sm:text-base text-slate-600 max-w-xl leading-relaxed px-4 text-center">
+              Expert obstetric, gynaecology, fertility and antenatal care in Tumakuru.
             </p>
 
             <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-center gap-3 pt-6 w-full max-w-lg px-4">
