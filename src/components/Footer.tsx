@@ -1,5 +1,5 @@
 import React from 'react';
-import { AlertTriangle, Phone, Mail, MapPin, ShieldCheck, MessageCircle } from 'lucide-react';
+import { AlertTriangle, Phone, Mail, MapPin, MessageCircle } from 'lucide-react';
 import { useClinicConfig } from '../context/ClinicConfigContext';
 import { formatWhatsappNumber } from '../utils/whatsapp';
 import { ClinicLogo } from './ClinicLogo';
@@ -62,47 +62,9 @@ export const Footer: React.FC<FooterProps> = ({ onNavigate, onOpenEmergency }) =
                 <span>Phone: {config.phone} | {config.mobile} | {config.mobileAlt}</span>
               </div>
             </div>
-
-            <div className="pt-2 flex flex-wrap items-center gap-2">
-              {config.accreditation.map((acc, idx) => (
-                <span key={idx} className="text-[10px] bg-slate-900 text-pink-200 px-2.5 py-1 rounded-lg border border-pink-900/60 flex items-center gap-1 font-semibold">
-                  <ShieldCheck className="w-3 h-3 text-pink-400" />
-                  {acc}
-                </span>
-              ))}
-            </div>
           </div>
 
-          <div className="space-y-3">
-            <h4 className="text-xs font-extrabold text-white uppercase tracking-wider">Clinical Services</h4>
-            <ul className="space-y-2 text-xs text-slate-400">
-              <li>
-                <button onClick={() => onNavigate('services')} className="hover:text-pink-300 transition-colors">
-                  Antenatal Checkups
-                </button>
-              </li>
-              <li>
-                <button onClick={() => onNavigate('services')} className="hover:text-pink-300 transition-colors">
-                  High Risk Pregnancy Care
-                </button>
-              </li>
-              <li>
-                <button onClick={() => onNavigate('services')} className="hover:text-pink-300 transition-colors">
-                  Fertility & Follicular Scan
-                </button>
-              </li>
-              <li>
-                <button onClick={() => onNavigate('services')} className="hover:text-pink-300 transition-colors">
-                  PCOS Management
-                </button>
-              </li>
-              <li>
-                <button onClick={() => onNavigate('services')} className="hover:text-pink-300 transition-colors">
-                  Pap Smear & Cancer Screening
-                </button>
-              </li>
-            </ul>
-          </div>
+          
 
           <div className="space-y-3">
             <h4 className="text-xs font-extrabold text-white uppercase tracking-wider">

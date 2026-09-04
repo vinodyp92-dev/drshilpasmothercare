@@ -113,53 +113,62 @@ export const Hero: React.FC<HeroProps> = ({ onOpenBooking, onNavigate }) => {
 
         <div className="relative z-[3] max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 min-h-[min(90vh,860px)] flex flex-col justify-center py-16 sm:py-20 pb-28">
           <div className="w-full flex flex-col items-center text-center hero-enter">
-            {/* Tagline arc above; logo pulled up so arc sits over the top of the logo */}
-            <div className="relative flex flex-col items-center mb-4 sm:mb-6 w-full max-w-[440px]">
-              <svg
-                viewBox="0 0 440 200"
-                className="relative z-[1] w-full max-w-[440px] h-auto overflow-visible"
-                role="img"
-                aria-label={config.taglineTransliteration}
-              >
-                <defs>
-                  {/* Top semicircle — flipped 180° from previous bottom arc */}
-                  <path
-                    id="hero-tagline-arc"
-                    d="M 30 188 A 190 190 0 0 0 410 188"
-                    fill="none"
-                  />
-                </defs>
-                <text
-                  fill="#9d174d"
-                  style={{
-                    fontSize: '26px',
-                    fontWeight: 700,
-                    letterSpacing: '0.04em',
-                    fontFamily: 'Playfair Display, Georgia, serif',
-                    textTransform: 'uppercase'
-                  }}
-                >
-                  <textPath
-                    href="#hero-tagline-arc"
-                    xlinkHref="#hero-tagline-arc"
-                    startOffset="50%"
-                    textAnchor="middle"
-                  >
-                    {config.taglineTransliteration.toUpperCase()}
-                  </textPath>
-                </text>
-              </svg>
-
-              <div className="relative z-0 -mt-[8.75rem] sm:-mt-[10.5rem] lg:-mt-[11.5rem] rounded-full p-2 sm:p-2.5 bg-white/90 shadow-[0_20px_50px_-20px_rgba(190,24,93,0.45)]">
+            {/* Tagline arc hugs the white badge (bottom), with a small safe clearance */}
+            <div className="relative mx-auto mb-4 sm:mb-5 w-fit">
+              <div className="relative z-0 rounded-full p-2 sm:p-2.5 bg-white/90 shadow-[0_20px_50px_-20px_rgba(190,24,93,0.45)]">
                 <ClinicLogo
                   size="xl"
                   showBadgeBackground={false}
                   className="!rounded-full !w-40 !h-40 sm:!w-48 sm:!h-48 lg:!w-52 lg:!h-52 !border-0 !shadow-none !ring-0 !p-1.5 bg-white"
                 />
+
+                {/* Overlay sized to the white badge; path sits just outside its rim */}
+                <svg
+                  viewBox="0 0 200 200"
+                  className="absolute left-1/2 top-1/2 z-[1] h-[136%] w-[136%] -translate-x-1/2 -translate-y-1/2 overflow-visible pointer-events-none"
+                  role="img"
+                  aria-label={config.taglineTransliteration}
+                >
+                  <defs>
+                    {/*
+                      Badge fills center: r ≈ 100/1.36 ≈ 73.5
+                      Path at r=78 ≈ ~6px outside white badge; bottom arc (sweep 0)
+                    */}
+                    <path
+                      id="hero-tagline-arc"
+                      d="M 22 100 A 78 78 0 0 0 178 100"
+                      fill="none"
+                    />
+                  </defs>
+                  <text
+                    fill="#6b21a8"
+                    dy="6"
+                    style={{
+                      fontSize: '12.5px',
+                      fontWeight: 800,
+                      letterSpacing: '0.05em',
+                      wordSpacing: '0.15em',
+                      fontFamily: 'Playfair Display, Georgia, serif',
+                      textTransform: 'uppercase'
+                    }}
+                  >
+                    <textPath
+                      href="#hero-tagline-arc"
+                      xlinkHref="#hero-tagline-arc"
+                      startOffset="50%"
+                      textAnchor="middle"
+                      spacing="auto"
+                      textLength={255}
+                      lengthAdjust="spacing"
+                    >
+                      {config.taglineTransliteration.toUpperCase()}
+                    </textPath>
+                  </text>
+                </svg>
               </div>
             </div>
 
-            <div className="mx-auto inline-block text-left px-2 mt-14 sm:mt-20 lg:mt-24">
+            <div className="mx-auto inline-block text-left px-2 mt-8 sm:mt-9">
               <h1 className="font-aesthetic font-extrabold tracking-tight leading-[1.05]">
                 <span className="block text-3xl sm:text-5xl lg:text-6xl text-pink-800">
                   {config.brandPrefix}
@@ -264,7 +273,7 @@ export const Hero: React.FC<HeroProps> = ({ onOpenBooking, onNavigate }) => {
           {[
             { value: '5,000+', label: 'Healthy deliveries' },
             { value: '15+ Yrs', label: 'OBG expertise' },
-            { value: '4.98 ★', label: 'Patient reviews' },
+            { value: '5.00 ★', label: 'Patient reviews' },
             { value: 'Tumakuru', label: 'Shettihalli Main Rd' }
           ].map((stat) => (
             <div key={stat.label}>

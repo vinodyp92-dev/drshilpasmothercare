@@ -19,8 +19,7 @@ const SECTION_IDS = [
   'services',
   'booking',
   'health-tools',
-  'location',
-  'contact'
+  'location'
 ] as const;
 
 function MainApp() {

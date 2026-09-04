@@ -73,9 +73,6 @@ export const DoctorsSection: React.FC<DoctorsSectionProps> = ({ onSelectDoctor }
                   <span className="text-xs font-extrabold text-pink-700 uppercase tracking-wider bg-pink-100 px-3 py-0.5 rounded-full border border-pink-200">
                     {selectedDoc.department}
                   </span>
-                  <span className="text-xs font-bold text-emerald-700 bg-emerald-50 px-2.5 py-0.5 rounded-full border border-emerald-200">
-                    Accepting New Patients
-                  </span>
                 </div>
                 <h3 className="text-2xl sm:text-3xl font-extrabold text-slate-900">
                   {selectedDoc.name}

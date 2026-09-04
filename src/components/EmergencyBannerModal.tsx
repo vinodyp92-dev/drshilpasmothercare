@@ -44,7 +44,7 @@ export const EmergencyBannerModal: React.FC<EmergencyModalProps> = ({ isOpen, on
               Experiencing severe pregnancy complications?
             </p>
             <p className="text-xs text-rose-800 leading-relaxed font-medium">
-              Do not wait for an online appointment. Call 108 Emergency or contact {config.name}'s emergency triage line immediately if you experience any of the following:
+              Do not wait for an online appointment.contact {config.name}'s emergency triage line immediately if you experience any of the following:
             </p>
           </div>
 
@@ -85,14 +85,6 @@ export const EmergencyBannerModal: React.FC<EmergencyModalProps> = ({ isOpen, on
 
           {/* Action Buttons */}
           <div className="pt-3 border-t border-slate-100 flex flex-col sm:flex-row gap-3">
-            <a 
-              href="tel:108"
-              className="flex-1 py-3 px-4 bg-rose-600 hover:bg-rose-700 text-white font-extrabold rounded-2xl text-center shadow-md flex items-center justify-center gap-2 transition-colors text-xs"
-            >
-              <Phone className="w-4 h-4" />
-              Call 108 Ambulance
-            </a>
-
             <a 
               href={formatTelHref(config.mobile)}
               className="flex-1 py-3 px-4 bg-slate-900 hover:bg-slate-800 text-white font-bold rounded-2xl text-center flex items-center justify-center gap-2 transition-colors text-xs"

@@ -34,7 +34,7 @@ export const Header: React.FC<HeaderProps> = ({
     { id: 'booking', label: 'Book Visit' },
     { id: 'health-tools', label: 'Health Tools' },
     { id: 'location', label: 'Location' },
-    { id: 'contact', label: 'Contact Us' }
+    { id: 'contact', label: 'Contact Us', targetId: 'location' as const }
   ];
 
   const whatsappNumber = formatWhatsappNumber(config.receptionistWhatsapp || config.mobile);
@@ -97,13 +97,12 @@ export const Header: React.FC<HeaderProps> = ({
         <div className="hidden xl:block border-t border-slate-100/80 py-1.5 px-4 sm:px-6 bg-white/40">
           <div className="max-w-7xl mx-auto flex items-center justify-start gap-1">
             {navItems.map((item) => {
-              const active =
-                activeSection === item.id ||
-                (item.id === 'contact' && activeSection === 'location');
+              const sectionId = 'targetId' in item && item.targetId ? item.targetId : item.id;
+              const active = activeSection === sectionId;
               return (
                 <button
                   key={item.id}
-                  onClick={() => onNavigate(item.id)}
+                  onClick={() => onNavigate(sectionId)}
                   className={`relative px-3.5 py-1.5 rounded-lg text-xs font-bold transition-all cursor-pointer ${
                     active
                       ? 'bg-pink-600 text-white shadow-sm'
@@ -120,23 +119,25 @@ export const Header: React.FC<HeaderProps> = ({
         {mobileMenuOpen && (
           <div className="xl:hidden bg-white/95 border-t border-pink-100 px-4 pt-3 pb-6 space-y-3 animate-fade-in">
             <nav className="flex flex-col space-y-1">
-              {navItems.map((item) => (
+              {navItems.map((item) => {
+                const sectionId = 'targetId' in item && item.targetId ? item.targetId : item.id;
+                return (
                 <button
                   key={item.id}
                   onClick={() => {
-                    onNavigate(item.id);
+                    onNavigate(sectionId);
                     setMobileMenuOpen(false);
                   }}
                   className={`text-left px-3 py-2.5 rounded-xl text-xs font-bold transition-colors ${
-                    activeSection === item.id ||
-                    (item.id === 'contact' && activeSection === 'location')
+                    activeSection === sectionId
                       ? 'bg-pink-50 text-pink-900'
                       : 'text-slate-700 hover:bg-pink-50/50'
                   }`}
                 >
                   {item.label}
                 </button>
-              ))}
+              );
+              })}
             </nav>
             <div className="pt-3 border-t border-pink-100 flex flex-col gap-2">
               {whatsappUrl && (

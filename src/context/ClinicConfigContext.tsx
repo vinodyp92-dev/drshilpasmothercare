@@ -16,6 +16,7 @@ export interface ClinicConfig {
   emergencyHotline: string;
   email: string;
   googleMapsUrl: string;
+  googleMapsEmbedUrl: string;
   doctorWhatsapp: string;
   receptionistWhatsapp: string;
   hours: {
@@ -32,17 +33,19 @@ export const CLINIC_CONFIG: ClinicConfig = {
   name: "Dr. Shilpa's MOTHER CARE",
   brandPrefix: "Dr. Shilpa's",
   brandAccent: 'MOTHER CARE',
-  tagline: 'MATRU RAKSHANA PARAMO DHARMAH',
-  taglineTransliteration: 'MATRU RAKSHANA PARAMO DHARMAH',
+  tagline: 'MAATRU RAKSHANAM PARAMO DHARMAH',
+  taglineTransliteration: 'MAATRU RAKSHANAM PARAMO DHARMAH',
   address: 'Shettihalli Main Rd, Dasappa Garden',
   landmark: 'Near Dasappa Garden Junction',
   cityStatePincode: 'Tumakuru, Karnataka 572102',
   phone: '0816 4052517',
-  mobile: '9900047256',
+  mobile: '9900047256/9743033256',
   mobileAlt: '9743033256',
-  emergencyHotline: '9900047256 / 9743033256',
+  emergencyHotline: '9743033256',
   email: 'care@drshilpamothercare.in',
   googleMapsUrl: 'https://maps.app.goo.gl/VXiQtJ3etaJ2tbB1A',
+  googleMapsEmbedUrl:
+    'https://www.google.com/maps?q=Dr.+Shilpa%27s+MOTHER+CARE,+Shettihalli+Main+Rd,+Dasappa+Garden,+Tumakuru,+Karnataka+572102&z=16&output=embed',
   doctorWhatsapp: '9743033256',
   receptionistWhatsapp: '9900047256',
   hours: {
