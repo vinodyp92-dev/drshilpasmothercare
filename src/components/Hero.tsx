@@ -113,42 +113,38 @@ export const Hero: React.FC<HeroProps> = ({ onOpenBooking, onNavigate }) => {
 
         <div className="relative z-[3] max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 min-h-[min(90vh,860px)] flex flex-col justify-center py-16 sm:py-20 pb-28">
           <div className="w-full flex flex-col items-center text-center hero-enter">
-            {/* Circular logo + curved tagline arc */}
-            <div className="relative w-[min(92vw,420px)] h-[min(92vw,420px)] mb-4 sm:mb-6">
+            {/* Circular logo with curved tagline below */}
+            <div className="relative flex flex-col items-center mb-2 sm:mb-4 w-full max-w-[440px]">
+              <div className="relative z-[1] rounded-full p-2 sm:p-3 bg-white/80 shadow-[0_20px_50px_-20px_rgba(190,24,93,0.45)] ring-4 ring-pink-200/70">
+                <ClinicLogo
+                  size="xl"
+                  showBadgeBackground={false}
+                  className="!rounded-full !w-36 !h-36 sm:!w-44 sm:!h-44 lg:!w-52 lg:!h-52 !border-0 !shadow-none !p-2 bg-white"
+                />
+              </div>
+
               <svg
-                viewBox="0 0 420 420"
-                className="absolute inset-0 w-full h-full"
-                aria-hidden={false}
+                viewBox="0 0 440 130"
+                className="relative z-0 w-[min(96vw,460px)] h-auto -mt-1 sm:-mt-2"
                 role="img"
                 aria-label={config.taglineTransliteration}
               >
                 <defs>
+                  {/* Gentle half-circle curve under the logo */}
                   <path
                     id="hero-tagline-arc"
-                    d="M 48 250 A 162 162 0 0 1 372 250"
+                    d="M 18 42 Q 220 128 422 42"
                     fill="none"
                   />
                 </defs>
-                <circle
-                  cx="210"
-                  cy="210"
-                  r="168"
-                  fill="none"
-                  stroke="rgba(190,24,93,0.18)"
-                  strokeWidth="2"
-                  strokeDasharray="6 8"
-                />
-                <circle
-                  cx="210"
-                  cy="210"
-                  r="152"
-                  fill="none"
-                  stroke="rgba(147,51,234,0.16)"
-                  strokeWidth="1.5"
-                />
                 <text
                   fill="#9d174d"
-                  style={{ fontSize: '17px', fontWeight: 700, letterSpacing: '0.03em', fontFamily: 'Playfair Display, Georgia, serif' }}
+                  style={{
+                    fontSize: '32px',
+                    fontWeight: 700,
+                    letterSpacing: '0.015em',
+                    fontFamily: 'Playfair Display, Georgia, serif'
+                  }}
                 >
                   <textPath
                     href="#hero-tagline-arc"
@@ -160,16 +156,6 @@ export const Hero: React.FC<HeroProps> = ({ onOpenBooking, onNavigate }) => {
                   </textPath>
                 </text>
               </svg>
-
-              <div className="absolute inset-0 flex items-center justify-center">
-                <div className="rounded-full p-2 sm:p-3 bg-white/80 shadow-[0_20px_50px_-20px_rgba(190,24,93,0.45)] ring-4 ring-pink-200/70">
-                  <ClinicLogo
-                    size="xl"
-                    showBadgeBackground={false}
-                    className="!rounded-full !w-36 !h-36 sm:!w-44 sm:!h-44 lg:!w-48 lg:!h-48 !border-0 !shadow-none !p-2 bg-white"
-                  />
-                </div>
-              </div>
             </div>
 
             <h1 className="font-aesthetic font-extrabold tracking-tight text-slate-900 leading-[1.05] px-2">
