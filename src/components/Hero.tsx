@@ -4,6 +4,9 @@ import { useClinicConfig } from '../context/ClinicConfigContext';
 import { formatWhatsappNumber } from '../utils/whatsapp';
 import { ClinicLogo } from './ClinicLogo';
 import { CallNumbersMenu } from './CallNumbersMenu';
+import heroSlide1 from '../assets/images/hero-slide-1.jpg';
+import heroSlide3 from '../assets/images/hero-slide-3.jpg';
+import heroSlide4 from '../assets/images/hero-slide-4.jpg';
 
 interface HeroProps {
   onOpenBooking: (doctorId?: string, serviceId?: string) => void;
@@ -12,30 +15,34 @@ interface HeroProps {
 
 const SLIDE_INTERVAL_MS = 5500;
 
-/** Soft baby-pink / lavender themed maternity slides */
+/** Lifestyle photos with soft baby-pink / lavender color wash */
 const HERO_SLIDES = [
   {
-    gradient: 'from-[#fce7f3] via-[#fbcfe8] to-[#e9d5ff]',
-    accent: 'from-pink-300/40 via-fuchsia-200/30 to-violet-300/40',
-    alt: 'Soft pink maternity care atmosphere',
+    src: heroSlide1,
+    gradient: 'from-[#fce7f3]/80 via-[#fbcfe8]/65 to-[#e9d5ff]/75',
+    accent: 'from-pink-300/35 via-fuchsia-200/25 to-violet-300/35',
+    alt: 'Expecting mother — maternity care journey',
     label: 'Maternity care'
   },
   {
-    gradient: 'from-[#fae8ff] via-[#f5d0fe] to-[#e0e7ff]',
-    accent: 'from-fuchsia-200/35 via-pink-200/30 to-indigo-200/35',
-    alt: 'Lavender mother and baby wellness',
+    src: 'https://images.unsplash.com/photo-1555252333-9f8e92e65df9?auto=format&fit=crop&w=2000&q=85',
+    gradient: 'from-[#fae8ff]/80 via-[#f5d0fe]/65 to-[#e0e7ff]/75',
+    accent: 'from-fuchsia-200/30 via-pink-200/25 to-indigo-200/30',
+    alt: 'Mother holding newborn with gentle care',
     label: 'Mother & baby'
   },
   {
-    gradient: 'from-[#fdf2f8] via-[#fce7f3] to-[#ede9fe]',
-    accent: 'from-rose-200/40 via-pink-300/25 to-purple-200/40',
-    alt: 'Baby pink newborn care mood',
+    src: heroSlide3,
+    gradient: 'from-[#fdf2f8]/80 via-[#fce7f3]/65 to-[#ede9fe]/75',
+    accent: 'from-rose-200/35 via-pink-300/20 to-purple-200/35',
+    alt: 'Newborn baby — early parenthood care',
     label: 'Newborn care'
   },
   {
-    gradient: 'from-[#f3e8ff] via-[#fce7f3] to-[#fdf4ff]',
-    accent: 'from-violet-300/35 via-pink-200/30 to-rose-200/35',
-    alt: 'Purple-pink family wellness theme',
+    src: heroSlide4,
+    gradient: 'from-[#f3e8ff]/80 via-[#fce7f3]/65 to-[#fdf4ff]/75',
+    accent: 'from-violet-300/30 via-pink-200/25 to-rose-200/30',
+    alt: 'Peaceful baby resting — family wellness',
     label: 'Family wellness'
   }
 ] as const;
@@ -84,21 +91,33 @@ export const Hero: React.FC<HeroProps> = ({ onOpenBooking, onNavigate }) => {
           {HERO_SLIDES.map((slide, index) => (
             <div
               key={`${slide.label}-${index}`}
-              className={`absolute inset-0 transition-opacity duration-[1200ms] ease-out bg-gradient-to-br ${slide.gradient} ${
+              className={`absolute inset-0 transition-opacity duration-[1200ms] ease-out ${
                 index === active ? 'opacity-100 z-[1]' : 'opacity-0 z-0'
               }`}
               aria-hidden={index !== active}
             >
-              <div
-                className={`absolute inset-0 bg-gradient-to-tr ${slide.accent} ${
+              <img
+                src={slide.src}
+                alt={slide.alt}
+                className={`h-full w-full object-cover scale-105 ${
                   index === active ? 'hero-kenburns' : ''
                 }`}
+                loading={index === 0 ? 'eager' : 'lazy'}
+                decoding="async"
               />
               <div
-                className="absolute inset-0 opacity-30"
+                className={`absolute inset-0 bg-gradient-to-br ${slide.gradient}`}
+                aria-hidden
+              />
+              <div
+                className={`absolute inset-0 bg-gradient-to-tr ${slide.accent}`}
+                aria-hidden
+              />
+              <div
+                className="absolute inset-0 opacity-40"
                 style={{
                   backgroundImage:
-                    'radial-gradient(circle at 20% 30%, rgba(255,255,255,0.7) 0, transparent 42%), radial-gradient(circle at 80% 20%, rgba(255,255,255,0.45) 0, transparent 35%), radial-gradient(circle at 70% 75%, rgba(244,114,182,0.25) 0, transparent 40%)'
+                    'radial-gradient(circle at 20% 30%, rgba(255,255,255,0.55) 0, transparent 42%), radial-gradient(circle at 80% 20%, rgba(255,255,255,0.35) 0, transparent 35%), radial-gradient(circle at 70% 75%, rgba(244,114,182,0.2) 0, transparent 40%)'
                 }}
                 aria-hidden
               />
@@ -106,7 +125,7 @@ export const Hero: React.FC<HeroProps> = ({ onOpenBooking, onNavigate }) => {
           ))}
 
           <div
-            className="absolute inset-0 z-[2] bg-gradient-to-b from-white/25 via-transparent to-pink-950/25"
+            className="absolute inset-0 z-[2] bg-gradient-to-b from-white/45 via-white/15 to-pink-950/30"
             aria-hidden
           />
         </div>
