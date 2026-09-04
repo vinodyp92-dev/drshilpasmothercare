@@ -6,6 +6,7 @@ export interface ClinicConfig {
   brandPrefix: string;
   brandAccent: string;
   tagline: string;
+  taglineTransliteration: string;
   taglineEnglish: string;
   address: string;
   landmark: string;
@@ -32,7 +33,8 @@ export const CLINIC_CONFIG: ClinicConfig = {
   name: "Dr. Shilpa's MOTHER CARE",
   brandPrefix: "Dr. Shilpa's",
   brandAccent: 'MOTHER CARE',
-  tagline: 'The protection of mothers is our supreme duty.',
+  tagline: 'Matru rakshana paramo dharmah',
+  taglineTransliteration: 'Matru rakshana paramo dharmah',
   taglineEnglish: 'The protection of mothers is our supreme duty.',
   address: 'Shettihalli Main Rd, Dasappa Garden',
   landmark: 'Near Dasappa Garden Junction',

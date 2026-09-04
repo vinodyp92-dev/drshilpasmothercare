@@ -275,15 +275,6 @@ export const BookingSection: React.FC<BookingSectionProps> = ({
               />
             </div>
 
-            <div className="p-3 bg-emerald-50/80 rounded-xl border border-emerald-200/80">
-              <p className="text-[10px] font-bold text-emerald-900 uppercase tracking-wider mb-2">
-                WhatsApp message preview
-              </p>
-              <pre className="text-[11px] text-slate-700 whitespace-pre-wrap font-sans leading-relaxed max-h-40 overflow-y-auto custom-scrollbar">
-                {messagePreview}
-              </pre>
-            </div>
-
             <button
               type="submit"
               className="btn-primary w-full py-3.5 text-sm cursor-pointer"

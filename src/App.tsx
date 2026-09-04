@@ -5,7 +5,6 @@ import { Hero } from './components/Hero';
 import { ServicesSection } from './components/ServicesSection';
 import { DoctorsSection } from './components/DoctorsSection';
 import { HealthToolsSection } from './components/HealthToolsSection';
-import { SymptomChecker } from './components/SymptomChecker';
 import { BookingSection } from './components/BookingSection';
 import { ReviewsSection } from './components/ReviewsSection';
 import { LocationHours } from './components/LocationHours';
@@ -16,12 +15,12 @@ import { Reveal } from './components/Reveal';
 
 const SECTION_IDS = [
   'hero',
-  'services',
   'doctors',
+  'services',
   'booking',
   'health-tools',
-  'symptom-checker',
-  'location'
+  'location',
+  'contact'
 ] as const;
 
 function MainApp() {
@@ -72,7 +71,6 @@ function MainApp() {
     <div className="min-h-screen bg-white font-sans-body text-slate-800 antialiased relative overflow-x-hidden">
       <Header
         onOpenBooking={() => handleOpenBooking()}
-        onOpenEmergency={() => setEmergencyModalOpen(true)}
         onNavigate={scrollToSection}
         activeSection={activeSection}
       />
@@ -81,13 +79,13 @@ function MainApp() {
         <Hero onOpenBooking={() => handleOpenBooking()} onNavigate={scrollToSection} />
 
         <Reveal>
-          <ServicesSection
-            onSelectService={(serviceName) => handleOpenBooking(undefined, serviceName)}
-          />
+          <DoctorsSection onSelectDoctor={(doctorId) => handleOpenBooking(doctorId, undefined)} />
         </Reveal>
 
         <Reveal delay={1}>
-          <DoctorsSection onSelectDoctor={(doctorId) => handleOpenBooking(doctorId, undefined)} />
+          <ServicesSection
+            onSelectService={(serviceName) => handleOpenBooking(undefined, serviceName)}
+          />
         </Reveal>
 
         <Reveal>
@@ -100,13 +98,6 @@ function MainApp() {
         <Reveal delay={1}>
           <HealthToolsSection
             onOpenBooking={(doctorId, serviceId) => handleOpenBooking(doctorId, serviceId)}
-          />
-        </Reveal>
-
-        <Reveal>
-          <SymptomChecker
-            onNavigateToBooking={(serviceName) => handleOpenBooking(undefined, serviceName)}
-            onOpenEmergency={() => setEmergencyModalOpen(true)}
           />
         </Reveal>
 

@@ -1,28 +1,21 @@
 import React, { useState, useEffect } from 'react';
-import { Phone, MapPin, AlertCircle, Calendar, Menu, X } from 'lucide-react';
-import { useClinicConfig } from '../context/ClinicConfigContext';
-import { isClinicOpenNow } from '../utils/clinicHours';
-import { formatTelHref } from '../utils/phone';
+import { Calendar, Menu, X } from 'lucide-react';
 import { ClinicLogo } from './ClinicLogo';
 import { ClinicBrandTitle } from './ClinicBrandTitle';
 
 interface HeaderProps {
   onOpenBooking: (doctorId?: string, serviceId?: string) => void;
-  onOpenEmergency: () => void;
   onNavigate: (sectionId: string) => void;
   activeSection: string;
 }
 
 export const Header: React.FC<HeaderProps> = ({
   onOpenBooking,
-  onOpenEmergency,
   onNavigate,
   activeSection
 }) => {
-  const { config } = useClinicConfig();
   const [isScrolled, setIsScrolled] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-  const [isOpenNow, setIsOpenNow] = useState(true);
 
   useEffect(() => {
     const handleScroll = () => setIsScrolled(window.scrollY > 16);
@@ -31,62 +24,17 @@ export const Header: React.FC<HeaderProps> = ({
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
-  useEffect(() => {
-    const updateOpenStatus = () => setIsOpenNow(isClinicOpenNow());
-
-    updateOpenStatus();
-    const id = window.setInterval(updateOpenStatus, 60_000);
-    return () => window.clearInterval(id);
-  }, [config.hours]);
-
   const navItems = [
-    { id: 'services', label: 'Services' },
     { id: 'doctors', label: 'Doctors' },
+    { id: 'services', label: 'Services' },
     { id: 'booking', label: 'Book Visit' },
     { id: 'health-tools', label: 'Health Tools' },
-    { id: 'symptom-checker', label: 'Symptoms' },
-    { id: 'location', label: 'Location' }
+    { id: 'location', label: 'Location' },
+    { id: 'contact', label: 'Contact Us' }
   ];
 
   return (
     <header className="sticky top-0 z-40 w-full">
-      <div className="bg-slate-950 text-slate-200 text-xs py-2 px-4 sm:px-6 border-b border-slate-800/80">
-        <div className="max-w-7xl mx-auto flex flex-col sm:flex-row justify-between items-center gap-2">
-          <div className="flex items-center gap-3 flex-wrap justify-center sm:justify-start">
-            <span className="flex items-center gap-1.5 text-slate-300 font-medium">
-              <MapPin className="w-3.5 h-3.5 text-pink-400" />
-              <span className="truncate max-w-[18rem] sm:max-w-none">
-                {config.address}, {config.cityStatePincode}
-              </span>
-            </span>
-            <span className="hidden sm:inline-block text-slate-700">|</span>
-            <span className="flex items-center gap-1.5">
-              <span className={`w-2 h-2 rounded-full ${isOpenNow ? 'bg-emerald-400 animate-pulse' : 'bg-amber-400'}`} />
-              <span className="font-semibold text-slate-100">
-                {isOpenNow ? 'Clinic open now' : 'OPD closed · Emergency on-call'}
-              </span>
-            </span>
-          </div>
-
-          <div className="flex items-center gap-3">
-            <button
-              onClick={onOpenEmergency}
-              className="flex items-center gap-1.5 text-rose-100 hover:text-white font-semibold bg-rose-950/90 hover:bg-rose-900 px-2.5 py-1 rounded-lg border border-rose-800/80 transition-colors cursor-pointer text-[11px]"
-            >
-              <AlertCircle className="w-3.5 h-3.5 text-rose-400" />
-              <span>Maternity emergency</span>
-            </button>
-            <a
-              href={formatTelHref(config.phone)}
-              className="flex items-center gap-1.5 text-slate-100 hover:text-white transition-colors font-bold text-xs"
-            >
-              <Phone className="w-3.5 h-3.5 text-pink-400" />
-              <span>{config.phone}</span>
-            </a>
-          </div>
-        </div>
-      </div>
-
       <div
         className={`surface-glass border-b transition-shadow duration-300 ${
           isScrolled ? 'border-slate-200/90 shadow-md' : 'border-slate-200/60 shadow-none'
@@ -130,7 +78,9 @@ export const Header: React.FC<HeaderProps> = ({
         <div className="hidden xl:block border-t border-slate-100/80 py-1.5 px-4 sm:px-6 bg-white/40">
           <div className="max-w-7xl mx-auto flex items-center justify-start gap-1">
             {navItems.map((item) => {
-              const active = activeSection === item.id;
+              const active =
+                activeSection === item.id ||
+                (item.id === 'contact' && activeSection === 'location');
               return (
                 <button
                   key={item.id}
@@ -159,7 +109,8 @@ export const Header: React.FC<HeaderProps> = ({
                     setMobileMenuOpen(false);
                   }}
                   className={`text-left px-3 py-2.5 rounded-xl text-xs font-bold transition-colors ${
-                    activeSection === item.id
+                    activeSection === item.id ||
+                    (item.id === 'contact' && activeSection === 'location')
                       ? 'bg-pink-50 text-pink-900'
                       : 'text-slate-700 hover:bg-pink-50/50'
                   }`}

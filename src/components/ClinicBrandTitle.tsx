@@ -13,7 +13,7 @@ export const ClinicBrandTitle: React.FC<ClinicBrandTitleProps> = ({
   showTagline = true
 }) => {
   const { config } = useClinicConfig();
-  const { brandPrefix, brandAccent, taglineEnglish } = config;
+  const { brandPrefix, brandAccent, taglineTransliteration, taglineEnglish } = config;
 
   if (variant === 'hero') {
     return (
@@ -25,9 +25,14 @@ export const ClinicBrandTitle: React.FC<ClinicBrandTitleProps> = ({
           <span className="text-pink-300">{brandAccent}</span>
         </p>
         {showTagline && (
-          <p className="font-aesthetic text-2xl sm:text-3xl lg:text-4xl text-pink-100/95 leading-snug italic max-w-xl">
-            {taglineEnglish}
-          </p>
+          <>
+            <p className="font-aesthetic text-2xl sm:text-3xl lg:text-4xl text-pink-100/95 leading-snug max-w-xl">
+              {taglineTransliteration}
+            </p>
+            <p className="text-sm sm:text-base text-slate-200/90 italic max-w-xl leading-relaxed">
+              {taglineEnglish}
+            </p>
+          </>
         )}
       </div>
     );
@@ -43,8 +48,9 @@ export const ClinicBrandTitle: React.FC<ClinicBrandTitleProps> = ({
           {brandAccent}
         </span>
         {showTagline && (
-          <span className="text-[10px] sm:text-[11px] text-pink-300/90 font-medium block mt-2 leading-relaxed font-sans-body normal-case tracking-normal italic">
-            {taglineEnglish}
+          <span className="text-[10px] sm:text-[11px] text-pink-300/90 font-medium block mt-2 leading-relaxed font-sans-body normal-case tracking-normal">
+            {taglineTransliteration}
+            <span className="block italic text-pink-200/80 mt-0.5">{taglineEnglish}</span>
           </span>
         )}
       </div>
@@ -60,8 +66,8 @@ export const ClinicBrandTitle: React.FC<ClinicBrandTitleProps> = ({
         {brandAccent}
       </span>
       {showTagline && (
-        <span className="text-[9px] sm:text-[10px] text-pink-800/80 font-medium block mt-1.5 leading-snug font-sans-body normal-case tracking-normal line-clamp-2 italic">
-          {taglineEnglish}
+        <span className="text-[9px] sm:text-[10px] text-pink-800/80 font-medium block mt-1.5 leading-snug font-sans-body normal-case tracking-normal line-clamp-2">
+          {taglineTransliteration}
         </span>
       )}
     </div>
