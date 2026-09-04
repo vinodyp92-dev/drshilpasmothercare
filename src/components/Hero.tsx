@@ -113,11 +113,11 @@ export const Hero: React.FC<HeroProps> = ({ onOpenBooking, onNavigate }) => {
 
         <div className="relative z-[3] max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 min-h-[min(90vh,860px)] flex flex-col justify-center py-16 sm:py-20 pb-28">
           <div className="w-full flex flex-col items-center text-center hero-enter">
-            {/* Tagline arc above (flipped 180°), then circular logo — no overlap */}
+            {/* Tagline arc above; logo pulled up so arc sits over the top of the logo */}
             <div className="relative flex flex-col items-center mb-4 sm:mb-6 w-full max-w-[440px]">
               <svg
                 viewBox="0 0 440 200"
-                className="w-full max-w-[440px] h-auto mb-1 overflow-visible"
+                className="relative z-[1] w-full max-w-[440px] h-auto overflow-visible"
                 role="img"
                 aria-label={config.taglineTransliteration}
               >
@@ -150,7 +150,7 @@ export const Hero: React.FC<HeroProps> = ({ onOpenBooking, onNavigate }) => {
                 </text>
               </svg>
 
-              <div className="rounded-full p-2 sm:p-2.5 bg-white/90 shadow-[0_20px_50px_-20px_rgba(190,24,93,0.45)]">
+              <div className="relative z-0 -mt-24 sm:-mt-28 lg:-mt-32 rounded-full p-2 sm:p-2.5 bg-white/90 shadow-[0_20px_50px_-20px_rgba(190,24,93,0.45)]">
                 <ClinicLogo
                   size="xl"
                   showBadgeBackground={false}
