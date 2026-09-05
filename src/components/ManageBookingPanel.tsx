@@ -5,9 +5,9 @@ import {
   availableTimesForDate,
   cancelBooking,
   fetchTakenSlots,
-  isBookingSyncEnabled,
   lookupBooking,
   parseManageHash,
+  refreshBookingSyncStatus,
   rescheduleBooking,
   type BookingRecord
 } from '../utils/bookingApi';
@@ -17,7 +17,7 @@ import {
  * Opened via #manage=BOOKINGID.TOKEN from the WhatsApp confirmation message.
  */
 export const ManageBookingPanel: React.FC = () => {
-  const enabled = isBookingSyncEnabled();
+  const [enabled, setEnabled] = useState(false);
   const [open, setOpen] = useState(false);
   const [bookingId, setBookingId] = useState('');
   const [manageToken, setManageToken] = useState('');
@@ -29,6 +29,16 @@ export const ManageBookingPanel: React.FC = () => {
   const [busy, setBusy] = useState(false);
   const [message, setMessage] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    let cancelled = false;
+    refreshBookingSyncStatus().then((on) => {
+      if (!cancelled) setEnabled(on);
+    });
+    return () => {
+      cancelled = true;
+    };
+  }, []);
 
   useEffect(() => {
     if (!enabled) return;

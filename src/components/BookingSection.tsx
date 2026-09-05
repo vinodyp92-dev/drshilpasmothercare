@@ -19,7 +19,7 @@ import {
   buildManageUrl,
   createBooking,
   fetchTakenSlots,
-  isBookingSyncEnabled
+  refreshBookingSyncStatus
 } from '../utils/bookingApi';
 import { ManageBookingPanel } from './ManageBookingPanel';
 
@@ -33,7 +33,7 @@ export const BookingSection: React.FC<BookingSectionProps> = ({
   preselectedServiceName
 }) => {
   const { config } = useClinicConfig();
-  const syncEnabled = isBookingSyncEnabled();
+  const [syncEnabled, setSyncEnabled] = useState(false);
 
   const [selectedDoctorId, setSelectedDoctorId] = useState(
     preselectedDoctorId || DOCTORS_DATA[0].id
@@ -70,7 +70,17 @@ export const BookingSection: React.FC<BookingSectionProps> = ({
     if (preselectedServiceName) setSelectedService(preselectedServiceName);
   }, [preselectedServiceName]);
 
-  // Background slot sync — no-op when Sheet URL is not configured
+  useEffect(() => {
+    let cancelled = false;
+    refreshBookingSyncStatus().then((enabled) => {
+      if (!cancelled) setSyncEnabled(enabled);
+    });
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
+  // Background slot sync — no-op when server booking proxy is not configured
   useEffect(() => {
     if (!syncEnabled) {
       setTakenSlots([]);

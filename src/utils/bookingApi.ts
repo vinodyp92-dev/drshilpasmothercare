@@ -28,11 +28,28 @@ export interface BookAppointmentInput {
 type ApiOk<T> = { ok: true } & T;
 type ApiErr = { ok: false; error?: string; code?: string };
 
-const scriptUrl = () => (import.meta.env.VITE_BOOKING_SCRIPT_URL || '').trim();
-const scriptSecret = () => (import.meta.env.VITE_BOOKING_SCRIPT_SECRET || '').trim();
+const BOOKING_API_PATH = '/api/booking';
+
+/** Cached after refreshBookingSyncStatus() — secrets never live in the browser. */
+let syncEnabledCache: boolean | null = null;
 
 export function isBookingSyncEnabled(): boolean {
-  return Boolean(scriptUrl() && scriptSecret());
+  return syncEnabledCache === true;
+}
+
+export async function refreshBookingSyncStatus(): Promise<boolean> {
+  try {
+    const res = await fetch(BOOKING_API_PATH, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ action: 'status' })
+    });
+    const data = (await res.json()) as { ok?: boolean; enabled?: boolean };
+    syncEnabledCache = Boolean(data?.ok && data?.enabled);
+  } catch {
+    syncEnabledCache = false;
+  }
+  return syncEnabledCache;
 }
 
 function normalizeTime(t: string): string {
@@ -43,20 +60,11 @@ async function callApi<T>(
   action: string,
   payload: Record<string, unknown> = {}
 ): Promise<ApiOk<T> | ApiErr> {
-  const url = scriptUrl();
-  const secret = scriptSecret();
-  if (!url || !secret) {
-    return { ok: false, error: 'Booking sync is not configured' };
-  }
-
-  const body = JSON.stringify({ action, secret, ...payload });
-
   try {
-    const res = await fetch(url, {
+    const res = await fetch(BOOKING_API_PATH, {
       method: 'POST',
-      headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-      body,
-      redirect: 'follow'
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ action, ...payload })
     });
     const data = (await res.json()) as ApiOk<T> | ApiErr;
     if (!data || typeof data !== 'object') {
