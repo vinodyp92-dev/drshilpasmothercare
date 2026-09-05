@@ -94,12 +94,24 @@ function ensureHeaders_(sheet) {
     sheet.getRange(1, 1, 1, HEADERS.length).setValues([HEADERS]);
     sheet.setFrozenRows(1);
   }
-  // Keep date + time columns as text
-  sheet.getRange('H:I').setNumberFormat('@');
+  // Do NOT format entire columns H:I — that inflates getLastRow() and breaks appends.
+}
+
+/** Last row that has an id in column A (ignores format-only "used" rows). */
+function lastIdRow_(sheet) {
+  var last = sheet.getLastRow();
+  if (last < 1) return 0;
+  var scanTo = Math.min(Math.max(last, 1), 3000);
+  var ids = sheet.getRange(1, 1, scanTo, 1).getValues();
+  var max = 0;
+  for (var i = 0; i < ids.length; i++) {
+    if (String(ids[i][0] || '').trim() !== '') max = i + 1;
+  }
+  return max;
 }
 
 function readRows_(sheet) {
-  var lastRow = sheet.getLastRow();
+  var lastRow = lastIdRow_(sheet);
   if (lastRow < 2) return [];
   var values = sheet.getRange(2, 1, lastRow, HEADERS.length).getValues();
   return values.map(function (row, idx) {
@@ -233,7 +245,9 @@ function book_(params) {
   var id = Utilities.getUuid().slice(0, 8).toUpperCase();
   var token = Utilities.getUuid().replace(/-/g, '');
   var now = new Date().toISOString();
-  var row = sheet.getLastRow() + 1;
+  var row = lastIdRow_(sheet) + 1;
+  if (row < 2) row = 2;
+
   var values = [
     id,
     now,
@@ -249,9 +263,16 @@ function book_(params) {
     reason,
     token
   ];
-  // Force date/time as plain text so Sheets does not convert to Date serials
-  sheet.getRange(row, 1, row, HEADERS.length).setNumberFormat('@');
-  sheet.getRange(row, 1, row, HEADERS.length).setValues([values]);
+
+  var range = sheet.getRange(row, 1, row, HEADERS.length);
+  try {
+    // Avoid "data has 1 but range has N" when cells are merged
+    range.breakApart();
+  } catch (ignore) {}
+  range.setValues([values]);
+  // Text only these two cells as text (not whole columns)
+  sheet.getRange(row, 8).setNumberFormat('@').setValue(String(date));
+  sheet.getRange(row, 9).setNumberFormat('@').setValue(String(time));
 
   return json_({
     ok: true,
@@ -431,6 +452,8 @@ function publicBooking_(row) {
 }
 
 function json_(obj) {
+  obj = obj || {};
+  if (obj.apiVersion === undefined) obj.apiVersion = 2;
   return ContentService.createTextOutput(JSON.stringify(obj)).setMimeType(
     ContentService.MimeType.JSON
   );

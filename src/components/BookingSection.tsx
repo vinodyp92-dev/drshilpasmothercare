@@ -166,11 +166,11 @@ export const BookingSection: React.FC<BookingSectionProps> = ({
           setTakenSlots(taken);
           return;
         }
-        // Soft fallback: open WhatsApp without Sheet lock
+        // Sheet write failed — still open WhatsApp, but make the failure obvious
         setFormError(
           result.error
-            ? `${result.error} WhatsApp will still open so you can send the request.`
-            : null
+            ? `Could not save to clinic calendar: ${result.error}`
+            : 'Could not save to clinic calendar. WhatsApp will still open.'
         );
         setLastBookingId(undefined);
         setLastManageUrl(undefined);
