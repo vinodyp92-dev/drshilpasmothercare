@@ -154,26 +154,28 @@ export const BookingSection: React.FC<BookingSectionProps> = ({
       });
 
       if (!result.ok) {
-        setSubmitting(false);
-        setFormError(
-          result.code === 'SLOT_TAKEN'
-            ? 'That time was just taken. Please pick another slot.'
-            : result.error || 'Could not reserve slot. Try again or WhatsApp us directly.'
-        );
-        // Refresh taken list
-        const taken = await fetchTakenSlots(preferredDate, selectedDoctorId);
-        setTakenSlots(taken);
-        return;
+        // Hard block only for real conflicts; otherwise keep WhatsApp booking working
+        if (result.code === 'SLOT_TAKEN') {
+          setSubmitting(false);
+          setFormError('That time was just taken. Please pick another slot.');
+          const taken = await fetchTakenSlots(preferredDate, selectedDoctorId);
+          setTakenSlots(taken);
+          return;
+        }
+        // Soft fallback: open WhatsApp without Sheet lock
+        setFormError(null);
+        setLastBookingId(undefined);
+        setLastManageUrl(undefined);
+      } else {
+        bookingId = result.booking.id;
+        const token = result.booking.manageToken;
+        if (token) {
+          manageUrl = buildManageUrl(result.booking.id, token);
+        }
+        setLastBookingId(bookingId);
+        setLastManageUrl(manageUrl);
+        setTakenSlots((prev) => [...prev, preferredTime]);
       }
-
-      bookingId = result.booking.id;
-      const token = result.booking.manageToken;
-      if (token) {
-        manageUrl = buildManageUrl(result.booking.id, token);
-      }
-      setLastBookingId(bookingId);
-      setLastManageUrl(manageUrl);
-      setTakenSlots((prev) => [...prev, preferredTime]);
     }
 
     const message = buildBookingRequestMessage({

@@ -19,6 +19,75 @@ export function getBookingConfig() {
 }
 
 /**
+ * Apps Script Web Apps respond with 302 to googleusercontent.com.
+ * Many runtimes convert that follow into GET and drop the body, which returns HTML.
+ * We follow redirects manually and keep POST + body.
+ *
+ * @param {string} url
+ * @param {string} body
+ */
+async function postAppsScript(url, body) {
+  const headers = { 'Content-Type': 'text/plain;charset=utf-8' };
+  let currentUrl = url;
+  let res = await fetch(currentUrl, {
+    method: 'POST',
+    headers,
+    body,
+    redirect: 'manual'
+  });
+
+  let hops = 0;
+  while (res.status >= 300 && res.status < 400 && hops < 5) {
+    const location = res.headers.get('location');
+    if (!location) break;
+    currentUrl = new URL(location, currentUrl).toString();
+    hops += 1;
+    res = await fetch(currentUrl, {
+      method: 'POST',
+      headers,
+      body,
+      redirect: 'manual'
+    });
+  }
+
+  // Final hop may already be 200; if still a redirect URL resolved, try follow once
+  if (res.status >= 300 && res.status < 400) {
+    const location = res.headers.get('location');
+    if (location) {
+      res = await fetch(new URL(location, currentUrl).toString(), {
+        method: 'POST',
+        headers,
+        body,
+        redirect: 'follow'
+      });
+    }
+  }
+
+  const text = await res.text();
+  return { status: res.status, text };
+}
+
+function tryParseJson(text) {
+  const trimmed = String(text || '').trim();
+  if (!trimmed) return null;
+  try {
+    return JSON.parse(trimmed);
+  } catch {
+    // Some gateways wrap JSON; try to extract first {...} block
+    const start = trimmed.indexOf('{');
+    const end = trimmed.lastIndexOf('}');
+    if (start >= 0 && end > start) {
+      try {
+        return JSON.parse(trimmed.slice(start, end + 1));
+      } catch {
+        return null;
+      }
+    }
+    return null;
+  }
+}
+
+/**
  * @param {Record<string, unknown>} payload
  * @returns {Promise<{ status: number, body: Record<string, unknown> }>}
  */
@@ -43,23 +112,37 @@ export async function handleBookingRequest(payload = {}) {
 
   // Never trust a client-supplied secret — always inject server secret
   const { secret: _ignored, ...rest } = payload;
-  const body = JSON.stringify({ ...rest, action, secret });
+  const bodyPayload = { ...rest, action, secret };
+  const body = JSON.stringify(bodyPayload);
 
   try {
-    const res = await fetch(url, {
-      method: 'POST',
-      headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-      body,
-      redirect: 'follow'
-    });
-    const text = await res.text();
-    let data;
-    try {
-      data = JSON.parse(text);
-    } catch {
+    let { text } = await postAppsScript(url, body);
+    let data = tryParseJson(text);
+
+    // Fallback: GET query string (more reliable with Apps Script redirects)
+    if (!data) {
+      const params = new URLSearchParams();
+      Object.entries(bodyPayload).forEach(([key, value]) => {
+        if (value === undefined || value === null) return;
+        params.set(key, String(value));
+      });
+      const getRes = await fetch(`${url}?${params.toString()}`, {
+        method: 'GET',
+        redirect: 'follow'
+      });
+      text = await getRes.text();
+      data = tryParseJson(text);
+    }
+
+    if (!data || typeof data !== 'object') {
       return {
         status: 502,
-        body: { ok: false, error: 'Invalid response from booking service' }
+        body: {
+          ok: false,
+          error:
+            'Invalid response from booking service. Redeploy the Apps Script web app (Anyone) and confirm BOOKING_SCRIPT_URL.',
+          code: 'BAD_GAS_RESPONSE'
+        }
       };
     }
     return { status: 200, body: data };
