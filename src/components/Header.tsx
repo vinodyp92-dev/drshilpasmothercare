@@ -1,16 +1,18 @@
 import React, { useState, useEffect } from 'react';
-import { MessageCircle, Menu, X } from 'lucide-react';
+import { MessageCircle, Menu, X, Phone, MapPin } from 'lucide-react';
 import { useClinicConfig } from '../context/ClinicConfigContext';
 import { formatWhatsappNumber } from '../utils/whatsapp';
+import { formatTelHref } from '../utils/phone';
 import { ClinicLogo } from './ClinicLogo';
 import { ClinicBrandTitle } from './ClinicBrandTitle';
-import { CallNumbersMenu } from './CallNumbersMenu';
 
 interface HeaderProps {
   onOpenBooking: (doctorId?: string, serviceId?: string) => void;
   onNavigate: (sectionId: string) => void;
   activeSection: string;
 }
+
+const HEADER_CALL_NUMBER = '9743033256';
 
 export const Header: React.FC<HeaderProps> = ({
   onOpenBooking,
@@ -22,7 +24,7 @@ export const Header: React.FC<HeaderProps> = ({
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   useEffect(() => {
-    const handleScroll = () => setIsScrolled(window.scrollY > 16);
+    const handleScroll = () => setIsScrolled(window.scrollY > 12);
     handleScroll();
     window.addEventListener('scroll', handleScroll, { passive: true });
     return () => window.removeEventListener('scroll', handleScroll);
@@ -33,7 +35,7 @@ export const Header: React.FC<HeaderProps> = ({
     { id: 'services', label: 'Services' },
     { id: 'booking', label: 'Book Visit' },
     { id: 'health-tools', label: 'Health Tools' },
-    { id: 'location', label: 'Location' },
+    { id: 'location', label: 'Location', href: config.googleMapsUrl },
     { id: 'contact', label: 'Contact Us', targetId: 'location' as const }
   ];
 
@@ -42,120 +44,162 @@ export const Header: React.FC<HeaderProps> = ({
     ? `https://wa.me/${whatsappNumber}?text=${encodeURIComponent(`Hello ${config.name}, I would like to book an appointment.`)}`
     : undefined;
 
+  const handleNav = (item: (typeof navItems)[number]) => {
+    if ('href' in item && item.href) {
+      window.open(item.href, '_blank', 'noopener,noreferrer');
+      return;
+    }
+    const sectionId = 'targetId' in item && item.targetId ? item.targetId : item.id;
+    onNavigate(sectionId);
+  };
+
+  const navClass = (item: (typeof navItems)[number], active: boolean) =>
+    `relative px-3 py-2 text-[12px] font-semibold tracking-wide transition-colors cursor-pointer rounded-full ${
+      active
+        ? 'text-pink-800 bg-pink-100/90'
+        : 'text-slate-600 hover:text-pink-800 hover:bg-pink-50/80'
+    }`;
+
   return (
-    <header className="sticky top-0 z-40 w-full">
-      <div
-        className={`surface-glass border-b transition-shadow duration-300 ${
-          isScrolled ? 'border-slate-200/90 shadow-md' : 'border-slate-200/60 shadow-none'
-        }`}
-      >
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 py-3 flex items-center justify-between gap-4">
-          <button
-            onClick={() => onNavigate('hero')}
-            className="flex items-center gap-3.5 text-left cursor-pointer group min-w-0"
-          >
-            <ClinicLogo size="md" className="w-12 h-12 sm:w-14 sm:h-14 lg:w-16 lg:h-16 flex-shrink-0" />
-            <ClinicBrandTitle />
-          </button>
-
-          <div className="flex items-center gap-2.5">
-            {whatsappUrl ? (
-              <a
-                href={whatsappUrl}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="hidden sm:inline-flex items-center gap-1.5 px-3 py-2 text-xs font-bold text-emerald-800 bg-emerald-50 hover:bg-emerald-100 border border-emerald-200 rounded-xl transition-colors"
-              >
-                <MessageCircle className="w-3.5 h-3.5" />
-                WhatsApp
-              </a>
-            ) : (
-              <button
-                onClick={() => onOpenBooking()}
-                className="hidden sm:inline-flex items-center gap-1.5 px-3 py-2 text-xs font-bold text-emerald-800 bg-emerald-50 hover:bg-emerald-100 border border-emerald-200 rounded-xl transition-colors cursor-pointer"
-              >
-                <MessageCircle className="w-3.5 h-3.5" />
-                WhatsApp
-              </button>
-            )}
-
-            <div className="hidden sm:block">
-              <CallNumbersMenu variant="header" />
-            </div>
-
+    <>
+      <header className="fixed inset-x-0 top-0 z-50 w-full header-safe-top">
+        <div
+          className={`border-b backdrop-blur-xl transition-all duration-300 ${
+            isScrolled
+              ? 'bg-white/95 border-pink-200/70 shadow-[0_8px_30px_-12px_rgba(190,24,93,0.25)]'
+              : 'bg-white/85 border-pink-100/80 shadow-none'
+          }`}
+        >
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 py-2.5 flex items-center gap-3 lg:gap-5">
             <button
-              onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-              className="xl:hidden p-2 text-slate-600 hover:text-pink-900 rounded-xl hover:bg-pink-50 cursor-pointer"
-              aria-label="Toggle menu"
-              aria-expanded={mobileMenuOpen}
+              type="button"
+              onClick={() => onNavigate('hero')}
+              className="flex items-center gap-2.5 text-left cursor-pointer group min-w-0 flex-shrink-0"
             >
-              {mobileMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
+              <ClinicLogo size="md" className="w-11 h-11 sm:w-12 sm:h-12 flex-shrink-0" />
+              <ClinicBrandTitle showTagline={false} className="hidden sm:block" />
             </button>
-          </div>
-        </div>
 
-        <div className="hidden xl:block border-t border-slate-100/80 py-1.5 px-4 sm:px-6 bg-white/40">
-          <div className="max-w-7xl mx-auto flex items-center justify-start gap-1">
-            {navItems.map((item) => {
-              const sectionId = 'targetId' in item && item.targetId ? item.targetId : item.id;
-              const active = activeSection === sectionId;
-              return (
-                <button
-                  key={item.id}
-                  onClick={() => onNavigate(sectionId)}
-                  className={`relative px-3.5 py-1.5 rounded-lg text-xs font-bold transition-all cursor-pointer ${
-                    active
-                      ? 'bg-pink-600 text-white shadow-sm'
-                      : 'text-slate-700 hover:text-pink-800 hover:bg-pink-50/80'
-                  }`}
-                >
-                  {item.label}
-                </button>
-              );
-            })}
-          </div>
-        </div>
-
-        {mobileMenuOpen && (
-          <div className="xl:hidden bg-white/95 border-t border-pink-100 px-4 pt-3 pb-6 space-y-3 animate-fade-in">
-            <nav className="flex flex-col space-y-1">
+            <nav
+              className="hidden lg:flex flex-1 items-center justify-center gap-0.5 xl:gap-1 min-w-0"
+              aria-label="Primary"
+            >
               {navItems.map((item) => {
                 const sectionId = 'targetId' in item && item.targetId ? item.targetId : item.id;
+                const active = !('href' in item && item.href) && activeSection === sectionId;
                 return (
-                <button
-                  key={item.id}
-                  onClick={() => {
-                    onNavigate(sectionId);
-                    setMobileMenuOpen(false);
-                  }}
-                  className={`text-left px-3 py-2.5 rounded-xl text-xs font-bold transition-colors ${
-                    activeSection === sectionId
-                      ? 'bg-pink-50 text-pink-900'
-                      : 'text-slate-700 hover:bg-pink-50/50'
-                  }`}
-                >
-                  {item.label}
-                </button>
-              );
+                  <button
+                    key={item.id}
+                    type="button"
+                    onClick={() => handleNav(item)}
+                    className={navClass(item, active)}
+                  >
+                    {'href' in item && item.href ? (
+                      <span className="inline-flex items-center gap-1">
+                        <MapPin className="w-3 h-3 opacity-70" />
+                        {item.label}
+                      </span>
+                    ) : (
+                      item.label
+                    )}
+                  </button>
+                );
               })}
             </nav>
-            <div className="pt-3 border-t border-pink-100 flex flex-col gap-2">
-              {whatsappUrl && (
+
+            <div className="flex items-center gap-2 ml-auto lg:ml-0 flex-shrink-0">
+              {whatsappUrl ? (
                 <a
                   href={whatsappUrl}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="btn-primary w-full py-2.5 text-xs"
+                  className="hidden sm:inline-flex items-center gap-1.5 px-3 py-2 text-xs font-bold text-emerald-800 bg-emerald-50 hover:bg-emerald-100 border border-emerald-200/90 rounded-full transition-colors"
                 >
                   <MessageCircle className="w-3.5 h-3.5" />
-                  Book via WhatsApp
+                  WhatsApp
                 </a>
+              ) : (
+                <button
+                  type="button"
+                  onClick={() => onOpenBooking()}
+                  className="hidden sm:inline-flex items-center gap-1.5 px-3 py-2 text-xs font-bold text-emerald-800 bg-emerald-50 hover:bg-emerald-100 border border-emerald-200/90 rounded-full transition-colors cursor-pointer"
+                >
+                  <MessageCircle className="w-3.5 h-3.5" />
+                  WhatsApp
+                </button>
               )}
-              <CallNumbersMenu variant="mobile" />
+
+              <a
+                href={formatTelHref(HEADER_CALL_NUMBER)}
+                className="hidden sm:inline-flex items-center gap-1.5 px-3.5 py-2 text-xs font-bold text-pink-800 bg-pink-50 hover:bg-pink-100 border border-pink-200 rounded-full transition-colors"
+              >
+                <Phone className="w-3.5 h-3.5" />
+                Call
+              </a>
+
+              <button
+                type="button"
+                onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+                className="lg:hidden p-2 text-slate-600 hover:text-pink-900 rounded-xl hover:bg-pink-50 cursor-pointer"
+                aria-label="Toggle menu"
+                aria-expanded={mobileMenuOpen}
+              >
+                {mobileMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
+              </button>
             </div>
           </div>
-        )}
-      </div>
-    </header>
+
+          {mobileMenuOpen && (
+            <div className="lg:hidden bg-white/98 border-t border-pink-100 px-4 pt-3 pb-5 space-y-3 animate-fade-in">
+              <nav className="flex flex-col space-y-1">
+                {navItems.map((item) => {
+                  const sectionId = 'targetId' in item && item.targetId ? item.targetId : item.id;
+                  const active = !('href' in item && item.href) && activeSection === sectionId;
+                  return (
+                    <button
+                      key={item.id}
+                      type="button"
+                      onClick={() => {
+                        handleNav(item);
+                        setMobileMenuOpen(false);
+                      }}
+                      className={`text-left px-3 py-2.5 rounded-xl text-xs font-bold transition-colors ${
+                        active
+                          ? 'bg-pink-50 text-pink-900'
+                          : 'text-slate-700 hover:bg-pink-50/50'
+                      }`}
+                    >
+                      {item.label}
+                    </button>
+                  );
+                })}
+              </nav>
+              <div className="pt-3 border-t border-pink-100 flex flex-col gap-2">
+                {whatsappUrl && (
+                  <a
+                    href={whatsappUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="btn-primary w-full py-2.5 text-xs"
+                  >
+                    <MessageCircle className="w-3.5 h-3.5" />
+                    Book via WhatsApp
+                  </a>
+                )}
+                <a
+                  href={formatTelHref(HEADER_CALL_NUMBER)}
+                  className="btn-secondary w-full py-2.5 text-xs inline-flex items-center justify-center gap-1.5"
+                >
+                  <Phone className="w-3.5 h-3.5" />
+                  Call {HEADER_CALL_NUMBER}
+                </a>
+              </div>
+            </div>
+          )}
+        </div>
+      </header>
+      {/* Spacer so fixed header does not cover page content */}
+      <div className="header-offset" aria-hidden />
+    </>
   );
 };

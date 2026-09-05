@@ -15,35 +15,56 @@ interface HeroProps {
 
 const SLIDE_INTERVAL_MS = 5500;
 
-/** Lifestyle photos with soft baby-pink / lavender color wash */
+/** Lifestyle photos with soft baby-pink / lavender color wash (kept light so photos stay prominent) */
 const HERO_SLIDES = [
   {
     src: heroSlide1,
-    gradient: 'from-[#fce7f3]/80 via-[#fbcfe8]/65 to-[#e9d5ff]/75',
-    accent: 'from-pink-300/35 via-fuchsia-200/25 to-violet-300/35',
+    gradient: 'from-[#fce7f3]/35 via-[#fbcfe8]/20 to-[#e9d5ff]/30',
+    accent: 'from-pink-300/15 via-fuchsia-200/10 to-violet-300/15',
     alt: 'Expecting mother — maternity care journey',
     label: 'Maternity care'
   },
   {
     src: 'https://images.unsplash.com/photo-1555252333-9f8e92e65df9?auto=format&fit=crop&w=2000&q=85',
-    gradient: 'from-[#fae8ff]/80 via-[#f5d0fe]/65 to-[#e0e7ff]/75',
-    accent: 'from-fuchsia-200/30 via-pink-200/25 to-indigo-200/30',
+    gradient: 'from-[#fae8ff]/35 via-[#f5d0fe]/20 to-[#e0e7ff]/30',
+    accent: 'from-fuchsia-200/12 via-pink-200/10 to-indigo-200/12',
     alt: 'Mother holding newborn with gentle care',
     label: 'Mother & baby'
   },
   {
     src: heroSlide3,
-    gradient: 'from-[#fdf2f8]/80 via-[#fce7f3]/65 to-[#ede9fe]/75',
-    accent: 'from-rose-200/35 via-pink-300/20 to-purple-200/35',
+    gradient: 'from-[#fdf2f8]/35 via-[#fce7f3]/20 to-[#ede9fe]/30',
+    accent: 'from-rose-200/15 via-pink-300/8 to-purple-200/15',
     alt: 'Newborn baby — early parenthood care',
     label: 'Newborn care'
   },
   {
     src: heroSlide4,
-    gradient: 'from-[#f3e8ff]/80 via-[#fce7f3]/65 to-[#fdf4ff]/75',
-    accent: 'from-violet-300/30 via-pink-200/25 to-rose-200/30',
+    gradient: 'from-[#f3e8ff]/35 via-[#fce7f3]/20 to-[#fdf4ff]/30',
+    accent: 'from-violet-300/12 via-pink-200/10 to-rose-200/12',
     alt: 'Peaceful baby resting — family wellness',
     label: 'Family wellness'
+  },
+  {
+    src: 'https://images.unsplash.com/photo-1492725764893-90b379c2b6e7?auto=format&fit=crop&w=2000&q=85',
+    gradient: 'from-[#fce7f3]/30 via-[#fbcfe8]/18 to-[#fae8ff]/25',
+    accent: 'from-pink-200/12 via-rose-200/10 to-fuchsia-200/12',
+    alt: 'Expectant mother outdoors — antenatal wellness',
+    label: 'Antenatal wellness'
+  },
+  {
+    src: 'https://images.unsplash.com/photo-1515488042361-ee00e0ddd4e4?auto=format&fit=crop&w=2000&q=85',
+    gradient: 'from-[#ede9fe]/30 via-[#fce7f3]/18 to-[#fdf2f8]/25',
+    accent: 'from-violet-200/12 via-pink-200/10 to-rose-200/12',
+    alt: 'Tiny newborn hands — gentle newborn care',
+    label: 'Gentle beginnings'
+  },
+  {
+    src: 'https://images.unsplash.com/photo-1584820927498-cfe5211fd8bf?auto=format&fit=crop&w=2000&q=85',
+    gradient: 'from-[#fdf4ff]/30 via-[#fae8ff]/18 to-[#e0e7ff]/25',
+    accent: 'from-fuchsia-200/12 via-violet-200/10 to-indigo-200/12',
+    alt: 'Mother and child bonding — family care',
+    label: 'Bonding & care'
   }
 ] as const;
 
@@ -114,10 +135,10 @@ export const Hero: React.FC<HeroProps> = ({ onOpenBooking, onNavigate }) => {
                 aria-hidden
               />
               <div
-                className="absolute inset-0 opacity-40"
+                className="absolute inset-0 opacity-20"
                 style={{
                   backgroundImage:
-                    'radial-gradient(circle at 20% 30%, rgba(255,255,255,0.55) 0, transparent 42%), radial-gradient(circle at 80% 20%, rgba(255,255,255,0.35) 0, transparent 35%), radial-gradient(circle at 70% 75%, rgba(244,114,182,0.2) 0, transparent 40%)'
+                    'radial-gradient(circle at 20% 30%, rgba(255,255,255,0.4) 0, transparent 42%), radial-gradient(circle at 80% 20%, rgba(255,255,255,0.25) 0, transparent 35%), radial-gradient(circle at 70% 75%, rgba(244,114,182,0.12) 0, transparent 40%)'
                 }}
                 aria-hidden
               />
@@ -125,7 +146,7 @@ export const Hero: React.FC<HeroProps> = ({ onOpenBooking, onNavigate }) => {
           ))}
 
           <div
-            className="absolute inset-0 z-[2] bg-gradient-to-b from-white/45 via-white/15 to-pink-950/30"
+            className="absolute inset-0 z-[2] bg-gradient-to-b from-white/20 via-transparent to-pink-950/20"
             aria-hidden
           />
         </div>
@@ -192,7 +213,7 @@ export const Hero: React.FC<HeroProps> = ({ onOpenBooking, onNavigate }) => {
                 <span className="block text-3xl sm:text-5xl lg:text-6xl text-pink-800">
                   {config.brandPrefix}
                 </span>
-                <span className="block text-4xl sm:text-6xl lg:text-7xl text-pink-600 mt-1">
+                <span className="block text-4xl sm:text-6xl lg:text-7xl text-pink-600 mt-1 font-brand">
                   {config.brandAccent}
                 </span>
               </h1>
@@ -202,7 +223,7 @@ export const Hero: React.FC<HeroProps> = ({ onOpenBooking, onNavigate }) => {
               Expert obstetric, gynaecology, fertility and antenatal care in Tumakuru.
             </p>
 
-            <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-center gap-3 pt-6 w-full max-w-lg px-4">
+            <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-center gap-3 pt-12 sm:pt-14 w-full max-w-lg px-4">
               {whatsappUrl ? (
                 <a
                   href={whatsappUrl}
@@ -226,10 +247,7 @@ export const Hero: React.FC<HeroProps> = ({ onOpenBooking, onNavigate }) => {
                 </button>
               )}
 
-              <CallNumbersMenu
-                variant="hero"
-                className="[&_button]:!text-pink-900 [&_button]:!border-pink-300/80 [&_button]:!bg-white/70 [&_button]:hover:!bg-white"
-              />
+              <CallNumbersMenu variant="hero" />
             </div>
 
             <button

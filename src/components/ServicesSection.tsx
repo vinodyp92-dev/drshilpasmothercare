@@ -9,7 +9,9 @@ interface ServicesSectionProps {
 
 export const ServicesSection: React.FC<ServicesSectionProps> = ({ onSelectService }) => {
   const [selectedServiceId, setSelectedServiceId] = useState<string>(SERVICES_DATA[0].id);
-  const [categoryFilter, setCategoryFilter] = useState<'All' | 'Maternity' | 'Gynecology' | 'Fertility'>('All');
+  const [categoryFilter, setCategoryFilter] = useState<
+    'All' | 'Maternity' | 'Gynecology' | 'Fertility' | 'Others'
+  >('All');
 
   const activeService = SERVICES_DATA.find(s => s.id === selectedServiceId) || SERVICES_DATA[0];
 
@@ -27,19 +29,31 @@ export const ServicesSection: React.FC<ServicesSectionProps> = ({ onSelectServic
       case 'ShieldCheck': return <ShieldCheck className={iconClass} />;
       case 'Users': return <Users className={iconClass} />;
       case 'Stethoscope': return <Stethoscope className={iconClass} />;
+      case 'Flower2': return <Flower2 className={iconClass} />;
       default: return <Flower2 className={iconClass} />;
     }
   };
 
+  const maternityNames = ['Pre-Pregnancy Counseling', 'Antenatal Checkup', 'High Risk Pregnancy'];
+  const fertilityNames = ['Fertility Treatment', 'PCOS Management'];
+  const othersNames = ['Others'];
+
   const filteredServices = SERVICES_DATA.filter(service => {
     if (categoryFilter === 'Maternity') {
-      return ['Pre-Pregnancy Counseling', 'Antenatal Checkup', 'High Risk Pregnancy'].includes(service.name);
+      return maternityNames.includes(service.name);
     }
     if (categoryFilter === 'Fertility') {
-      return ['Fertility Treatment', 'PCOS Management'].includes(service.name);
+      return fertilityNames.includes(service.name);
+    }
+    if (categoryFilter === 'Others') {
+      return othersNames.includes(service.name);
     }
     if (categoryFilter === 'Gynecology') {
-      return !['Pre-Pregnancy Counseling', 'Antenatal Checkup', 'High Risk Pregnancy', 'Fertility Treatment'].includes(service.name);
+      return (
+        !maternityNames.includes(service.name) &&
+        !fertilityNames.includes(service.name) &&
+        !othersNames.includes(service.name)
+      );
     }
     return true;
   });
@@ -64,7 +78,7 @@ export const ServicesSection: React.FC<ServicesSectionProps> = ({ onSelectServic
 
         {/* Quick Category Filter Pills */}
         <div className="flex items-center justify-center gap-2 flex-wrap">
-          {(['All', 'Maternity', 'Fertility', 'Gynecology'] as const).map(cat => (
+          {(['All', 'Maternity', 'Fertility', 'Gynecology', 'Others'] as const).map(cat => (
             <button
               key={cat}
               type="button"
@@ -75,7 +89,7 @@ export const ServicesSection: React.FC<ServicesSectionProps> = ({ onSelectServic
                   : 'bg-white/90 text-slate-700 hover:bg-pink-50 border border-slate-200/90'
               }`}
             >
-              {cat === 'All' ? 'All Services (11)' : cat}
+              {cat === 'All' ? `All Services (${SERVICES_DATA.length})` : cat}
             </button>
           ))}
         </div>
@@ -198,13 +212,13 @@ export const ServicesSection: React.FC<ServicesSectionProps> = ({ onSelectServic
 
             {/* UNIFIED SINGLE BOOKING ACTION BLOCK */}
             <div className="pt-4 border-t border-slate-100 space-y-3">
-              <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 bg-gradient-to-r from-slate-900 to-pink-950 p-4 rounded-2xl text-white shadow-md">
+              <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 bg-gradient-to-r from-pink-100 via-rose-50 to-violet-100 p-4 rounded-2xl text-slate-800 shadow-sm border border-pink-200/80">
                 <div className="space-y-0.5">
-                  <span className="text-[10px] font-bold text-pink-300 uppercase tracking-wider block">
+                  <span className="text-[10px] font-bold text-pink-700 uppercase tracking-wider block">
                     Ready to book this specialty?
                   </span>
-                  <p className="text-xs font-bold text-slate-100">
-                    Schedule visit for <span className="text-pink-300">{activeService.name}</span>
+                  <p className="text-xs font-bold text-slate-800">
+                    Schedule visit for <span className="text-pink-700">{activeService.name}</span>
                   </p>
                 </div>
 

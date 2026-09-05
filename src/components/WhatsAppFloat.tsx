@@ -1,57 +1,40 @@
 import React, { useState } from 'react';
-import { MessageCircle, Phone, Calendar, X, Heart, ShieldCheck, ChevronRight } from 'lucide-react';
+import { MessageCircle, X, ShieldCheck, ChevronRight } from 'lucide-react';
 import { useClinicConfig } from '../context/ClinicConfigContext';
 import { formatWhatsappNumber } from '../utils/whatsapp';
-import { formatTelHref } from '../utils/phone';
 
-interface WhatsAppFloatProps {
-  onOpenBooking: () => void;
-}
-
-export const WhatsAppFloat: React.FC<WhatsAppFloatProps> = ({ onOpenBooking }) => {
+export const WhatsAppFloat: React.FC = () => {
   const { config } = useClinicConfig();
   const [isOpen, setIsOpen] = useState(false);
 
-  const recepNum = formatWhatsappNumber(config.receptionistWhatsapp || config.mobile);
-  const docNum = formatWhatsappNumber(config.doctorWhatsapp || config.mobile);
+  const recepNum = formatWhatsappNumber(config.receptionistWhatsapp);
 
   const defaultMsg = encodeURIComponent(
     `Hello ${config.name}, I would like to inquire about OPD consultation timings & book an appointment.`
   );
 
   return (
-    <div className="fixed bottom-5 right-5 z-40 flex flex-col items-end gap-3">
-
-      {/* Floating call — above WhatsApp */}
-      <a
-        href={formatTelHref(config.mobile)}
-        className="w-14 h-14 rounded-full bg-gradient-to-br from-pink-600 to-rose-600 hover:from-pink-700 hover:to-rose-700 text-white shadow-[0_12px_30px_-8px_rgb(219_39_119_/_0.55)] flex items-center justify-center transition-all border-2 border-white/90 hover:-translate-y-0.5 active:translate-y-0"
-        aria-label={`Call clinic at ${config.mobile}`}
-        title={`Call ${config.mobile}`}
-      >
-        <Phone className="w-6 h-6" />
-      </a>
-      
-      {/* Expanded Quick Options Menu */}
+    <>
       {isOpen && (
-        <div className="bg-white/95 backdrop-blur-xl rounded-3xl p-4 shadow-2xl border border-emerald-200/90 w-[calc(100vw-2.5rem)] max-w-xs sm:w-80 space-y-3 animate-fade-in">
-          
+        <div className="fixed float-safe-wa-menu z-40 bg-white/95 backdrop-blur-xl rounded-3xl p-4 shadow-2xl border border-emerald-200/90 w-[calc(100vw-2.5rem)] max-w-xs sm:w-80 space-y-3 animate-fade-in">
           <div className="flex items-center justify-between pb-2 border-b border-emerald-100">
             <div className="flex items-center gap-2">
               <div className="w-8 h-8 rounded-full bg-emerald-500 text-white flex items-center justify-center font-bold text-xs shadow-sm">
                 <MessageCircle className="w-4 h-4 fill-white text-emerald-500" />
               </div>
               <div>
-                <span className="text-xs font-extrabold text-slate-900 block leading-tight">Clinic Helpdesk</span>
+                <span className="text-xs font-extrabold text-slate-900 block leading-tight">WhatsApp Helpdesk</span>
                 <span className="text-[10px] text-emerald-600 font-bold flex items-center gap-1">
-                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
+                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
                   Replies in ~5 mins
                 </span>
               </div>
             </div>
             <button
+              type="button"
               onClick={() => setIsOpen(false)}
               className="p-1 text-slate-400 hover:text-slate-600 rounded-lg hover:bg-slate-100 cursor-pointer"
+              aria-label="Close WhatsApp menu"
             >
               <X className="w-4 h-4" />
             </button>
@@ -67,98 +50,40 @@ export const WhatsAppFloat: React.FC<WhatsAppFloatProps> = ({ onOpenBooking }) =
           </div>
 
           <div className="space-y-2">
-            {/* Reception Desk WhatsApp Link */}
-            <a
-              href={`https://wa.me/${recepNum}?text=${defaultMsg}`}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="w-full p-2.5 bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs rounded-xl shadow-xs transition-all flex items-center justify-between cursor-pointer group"
-            >
-              <div className="flex items-center gap-2">
-                <MessageCircle className="w-4 h-4 fill-white text-emerald-600" />
-                <div className="text-left">
-                  <span className="block font-extrabold leading-tight">Reception Desk WhatsApp</span>
-                  <span className="text-[10px] text-emerald-100 font-medium">{config.receptionistWhatsapp || config.mobile}</span>
+            {recepNum && (
+              <a
+                href={`https://wa.me/${recepNum}?text=${defaultMsg}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="w-full p-2.5 bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs rounded-xl shadow-xs transition-all flex items-center justify-between cursor-pointer group"
+              >
+                <div className="flex items-center gap-2">
+                  <MessageCircle className="w-4 h-4 fill-white text-emerald-600" />
+                  <div className="text-left">
+                    <span className="block font-extrabold leading-tight">Reception Desk WhatsApp</span>
+                    <span className="text-[10px] text-emerald-100 font-medium">{config.receptionistWhatsapp}</span>
+                  </div>
                 </div>
-              </div>
-              <ChevronRight className="w-4 h-4 group-hover:translate-x-0.5 transition-transform" />
-            </a>
-
-            {/* Doctor Direct WhatsApp Link */}
-            <a
-              href={`https://wa.me/${docNum}?text=${defaultMsg}`}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="w-full p-2.5 bg-emerald-50 hover:bg-emerald-100 text-emerald-950 font-bold text-xs rounded-xl border border-emerald-200 transition-all flex items-center justify-between cursor-pointer group"
-            >
-              <div className="flex items-center gap-2">
-                <MessageCircle className="w-4 h-4 text-emerald-600" />
-                <div className="text-left">
-                  <span className="block font-extrabold text-emerald-900 leading-tight">Doctor Direct WhatsApp</span>
-                  <span className="text-[10px] text-emerald-700 font-semibold">{config.doctorWhatsapp || config.mobile}</span>
-                </div>
-              </div>
-              <ChevronRight className="w-4 h-4 text-emerald-600 group-hover:translate-x-0.5 transition-transform" />
-            </a>
-
-            {/* Direct Call */}
-            <a
-              href={formatTelHref(config.mobile)}
-              className="w-full p-2.5 bg-slate-50 hover:bg-slate-100 text-slate-800 font-bold text-xs rounded-xl border border-slate-200 transition-all flex items-center justify-between cursor-pointer group"
-            >
-              <span className="flex items-center gap-2">
-                <Phone className="w-4 h-4 text-pink-600" />
-                <span>Call: {config.mobile}</span>
-              </span>
-              <ChevronRight className="w-4 h-4 text-slate-500 group-hover:translate-x-0.5 transition-transform" />
-            </a>
-
-            <a
-              href={formatTelHref(config.phone)}
-              className="w-full p-2.5 bg-slate-50 hover:bg-slate-100 text-slate-800 font-bold text-xs rounded-xl border border-slate-200 transition-all flex items-center justify-between cursor-pointer group"
-            >
-              <span className="flex items-center gap-2">
-                <Phone className="w-4 h-4 text-pink-600" />
-                <span>Landline: {config.phone}</span>
-              </span>
-              <ChevronRight className="w-4 h-4 text-slate-500 group-hover:translate-x-0.5 transition-transform" />
-            </a>
-
-            {/* Book Appointment Modal Trigger */}
-            <button
-              onClick={() => {
-                setIsOpen(false);
-                onOpenBooking();
-              }}
-              className="w-full p-2.5 bg-gradient-to-r from-pink-600 to-rose-600 hover:from-pink-700 hover:to-rose-700 text-white font-extrabold text-xs rounded-xl shadow-xs transition-all flex items-center justify-between cursor-pointer group"
-            >
-              <span className="flex items-center gap-2">
-                <Calendar className="w-4 h-4 text-white" />
-                <span>Book Visit / OPD Slot</span>
-              </span>
-              <ChevronRight className="w-4 h-4 group-hover:translate-x-0.5 transition-transform" />
-            </button>
+                <ChevronRight className="w-4 h-4 group-hover:translate-x-0.5 transition-transform" />
+              </a>
+            )}
           </div>
 
           <div className="pt-2 text-[10px] text-slate-400 text-center font-medium border-t border-slate-100">
-            Emergency Care Available 24x7 • Tumakuru
+            WhatsApp booking • Tumakuru
           </div>
-
         </div>
       )}
 
-      {/* Floating Trigger Button */}
       <button
+        type="button"
         onClick={() => setIsOpen(!isOpen)}
-        className="px-4 py-3.5 bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-600 hover:to-teal-700 text-white font-extrabold text-xs rounded-full shadow-[0_12px_30px_-8px_rgb(16_185_129_/_0.55)] flex items-center gap-2 transition-all cursor-pointer border-2 border-white/90 hover:-translate-y-0.5 active:translate-y-0"
-        aria-label="Quick WhatsApp & Call Support"
+        className="fixed float-safe-wa z-40 w-14 h-14 bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-600 hover:to-teal-700 text-white rounded-full shadow-[0_12px_30px_-8px_rgb(16_185_129_/_0.55)] flex items-center justify-center transition-all cursor-pointer border-2 border-white/90 hover:-translate-y-0.5 active:translate-y-0"
+        aria-label="WhatsApp booking options"
         aria-expanded={isOpen}
       >
-        <MessageCircle className="w-5 h-5 fill-white text-emerald-600" />
-        <span className="hidden sm:inline font-bold">WhatsApp / Quick booking</span>
-        <span className="sm:hidden font-bold">WhatsApp</span>
+        <MessageCircle className="w-6 h-6 fill-white text-emerald-600" />
       </button>
-
-    </div>
+    </>
   );
 };

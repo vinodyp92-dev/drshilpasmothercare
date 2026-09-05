@@ -1,5 +1,5 @@
 import React from 'react';
-import { AlertTriangle, Phone, ShieldAlert, X, Heart, Activity, Baby } from 'lucide-react';
+import { AlertTriangle, Phone, ShieldAlert, X, Activity, Baby } from 'lucide-react';
 import { useClinicConfig } from '../context/ClinicConfigContext';
 import { formatTelHref } from '../utils/phone';
 
@@ -85,12 +85,12 @@ export const EmergencyBannerModal: React.FC<EmergencyModalProps> = ({ isOpen, on
 
           {/* Action Buttons */}
           <div className="pt-3 border-t border-slate-100 flex flex-col sm:flex-row gap-3">
-            <a 
-              href={formatTelHref(config.mobile)}
+            <a
+              href={formatTelHref(config.emergencyHotline)}
               className="flex-1 py-3 px-4 bg-slate-900 hover:bg-slate-800 text-white font-bold rounded-2xl text-center flex items-center justify-center gap-2 transition-colors text-xs"
             >
               <Phone className="w-4 h-4 text-pink-400" />
-              Call Clinic Desk ({config.mobile})
+              Call Emergency ({config.emergencyHotline})
             </a>
           </div>
         </div>

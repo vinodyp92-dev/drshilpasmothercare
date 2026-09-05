@@ -46,7 +46,7 @@ export const CLINIC_CONFIG: ClinicConfig = {
   googleMapsUrl: 'https://maps.app.goo.gl/VXiQtJ3etaJ2tbB1A',
   googleMapsEmbedUrl:
     'https://www.google.com/maps?q=Dr.+Shilpa%27s+MOTHER+CARE,+Shettihalli+Main+Rd,+Dasappa+Garden,+Tumakuru,+Karnataka+572102&z=16&output=embed',
-  doctorWhatsapp: '9743033256',
+  doctorWhatsapp: '',
   receptionistWhatsapp: '9900047256',
   hours: {
     weekdays: CONSULTATION_HOURS_DISPLAY.weekdays,

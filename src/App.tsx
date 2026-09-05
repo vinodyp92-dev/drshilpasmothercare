@@ -11,6 +11,7 @@ import { LocationHours } from './components/LocationHours';
 import { Footer } from './components/Footer';
 import { EmergencyBannerModal } from './components/EmergencyBannerModal';
 import { WhatsAppFloat } from './components/WhatsAppFloat';
+import { CallFloat } from './components/CallFloat';
 import { Reveal } from './components/Reveal';
 
 const SECTION_IDS = [
@@ -111,7 +112,8 @@ function MainApp() {
 
       <Footer onNavigate={scrollToSection} onOpenEmergency={() => setEmergencyModalOpen(true)} />
 
-      <WhatsAppFloat onOpenBooking={() => handleOpenBooking()} />
+      <CallFloat />
+      <WhatsAppFloat />
 
       <EmergencyBannerModal
         isOpen={emergencyModalOpen}

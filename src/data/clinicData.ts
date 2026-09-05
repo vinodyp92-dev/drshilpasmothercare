@@ -185,6 +185,19 @@ export const SERVICES_DATA: MedicalService[] = [
     durationMinutes: 35,
     priceEstimate: '₹400 Consultation',
     isTelehealthAvailable: false
+  },
+  {
+    id: 'serv-12',
+    name: 'Others',
+    department: 'Women\'s Health & OB/GYN',
+    iconName: 'Flower2',
+    shortDescription: 'General women\'s health consultation and other specialty concerns not listed in the categories above.',
+    fullDescription: 'For any obstetric, gynaecology, fertility, or women\'s wellness concern that does not fit the listed specialties, choose Others. Our team will guide you to the right evaluation, tests, and follow-up during your visit.',
+    commonConditions: ['General Women\'s Health Query', 'Second Opinion Visit', 'Unlisted Symptom Review', 'Follow-up / Miscellaneous Care'],
+    procedures: ['Clinical Consultation', 'Need-based Examination', 'Investigation Guidance', 'Treatment / Referral Planning'],
+    durationMinutes: 25,
+    priceEstimate: '₹400 Consultation',
+    isTelehealthAvailable: true
   }
 ];
 

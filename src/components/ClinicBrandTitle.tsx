@@ -20,7 +20,7 @@ export const ClinicBrandTitle: React.FC<ClinicBrandTitleProps> = ({
       <div className={`space-y-2 text-center ${className}`}>
         <h1 className="font-aesthetic font-extrabold tracking-tight text-white leading-[1.05]">
           <span className="block text-3xl sm:text-4xl lg:text-5xl text-pink-200">{brandPrefix}</span>
-          <span className="block text-4xl sm:text-5xl lg:text-6xl text-pink-100 mt-1">
+          <span className="block text-4xl sm:text-5xl lg:text-6xl text-pink-100 mt-1 font-brand">
             {brandAccent}
           </span>
         </h1>
@@ -31,14 +31,14 @@ export const ClinicBrandTitle: React.FC<ClinicBrandTitleProps> = ({
   if (variant === 'footer') {
     return (
       <div className={`text-left ${className}`}>
-        <span className="font-aesthetic text-xl sm:text-2xl font-extrabold text-pink-200 block leading-tight">
+        <span className="font-aesthetic text-xl sm:text-2xl font-extrabold text-pink-800 block leading-tight">
           {brandPrefix}
         </span>
-        <span className="font-aesthetic text-2xl sm:text-3xl font-extrabold text-white tracking-wide block leading-none mt-0.5">
+        <span className="font-brand text-2xl sm:text-3xl text-pink-600 tracking-wide block leading-none mt-0.5">
           {brandAccent}
         </span>
         {showTagline && (
-          <span className="text-[10px] sm:text-[11px] text-pink-300/90 font-medium block mt-2 leading-relaxed font-sans-body normal-case tracking-normal uppercase">
+          <span className="text-[10px] sm:text-[11px] text-pink-700/80 font-medium block mt-2 leading-relaxed font-sans-body normal-case tracking-normal uppercase">
             {taglineTransliteration}
           </span>
         )}
@@ -51,7 +51,7 @@ export const ClinicBrandTitle: React.FC<ClinicBrandTitleProps> = ({
       <span className="font-aesthetic text-lg sm:text-xl lg:text-2xl font-extrabold text-pink-800 block leading-tight group-hover:text-pink-900 transition-colors">
         {brandPrefix}
       </span>
-      <span className="font-aesthetic text-xl sm:text-2xl lg:text-3xl font-extrabold text-pink-600 tracking-wide block leading-none">
+      <span className="font-brand text-xl sm:text-2xl lg:text-3xl text-pink-600 tracking-wide block leading-none">
         {brandAccent}
       </span>
       {showTagline && (

@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
-import { MapPin, Phone, Navigation, ChevronDown, ChevronUp, Car } from 'lucide-react';
+import { MapPin, Phone, Navigation, ChevronDown, ChevronUp } from 'lucide-react';
 import { getClinicFaqs } from '../utils/faq';
 import { useClinicConfig } from '../context/ClinicConfigContext';
+import { formatTelHref } from '../utils/phone';
 
 export const LocationHours: React.FC = () => {
   const { config } = useClinicConfig();
@@ -30,7 +31,7 @@ export const LocationHours: React.FC = () => {
             </span>
           </p>
           <p className="text-slate-600 text-sm sm:text-base leading-relaxed">
-            Conveniently located on Shettihalli Main Road with dedicated patient parking and comfortable facilities for expecting mothers.
+            Conveniently located on Shettihalli Main Road with comfortable facilities for expecting mothers.
           </p>
         </div>
 
@@ -49,26 +50,27 @@ export const LocationHours: React.FC = () => {
                 </div>
                 <div className="flex justify-between py-1 border-b border-slate-100">
                   <span className="text-slate-500 font-medium">Mobile / WhatsApp:</span>
-                  <a href={`tel:${config.mobile}`} className="font-bold text-pink-700 hover:underline">{config.mobile}</a>
+                  <a
+                    href={formatTelHref(config.receptionistWhatsapp)}
+                    className="font-bold text-pink-700 hover:underline"
+                  >
+                    {config.receptionistWhatsapp}
+                  </a>
                 </div>
                 <div className="flex justify-between py-1 border-b border-slate-100">
                   <span className="text-slate-500 font-medium">Emergency Line:</span>
-                  <span className="font-bold text-rose-600">{config.emergencyHotline}</span>
+                  <a
+                    href={formatTelHref(config.emergencyHotline)}
+                    className="font-bold text-rose-600 hover:underline"
+                  >
+                    {config.emergencyHotline}
+                  </a>
                 </div>
                 <div className="flex justify-between py-1">
                   <span className="text-slate-500 font-medium">Email Desk:</span>
                   <span className="font-semibold text-slate-800">{config.email}</span>
                 </div>
               </div>
-            </div>
-
-            <div className="p-4 bg-pink-50/60 rounded-3xl border border-pink-200 space-y-1.5 text-xs text-slate-700">
-              <div className="flex items-center gap-2 font-extrabold text-slate-900">
-                <Car className="w-4 h-4 text-pink-600" /> Dedicated Patient Parking
-              </div>
-              <p className="text-slate-600 leading-relaxed font-medium">
-                Ample parking space available directly in front of the clinic premises on Shettihalli Main Road.
-              </p>
             </div>
           </div>
 

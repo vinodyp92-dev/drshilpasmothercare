@@ -2,6 +2,7 @@
 
 @theme {
   --font-display: "Playfair Display", Georgia, serif;
+  --font-brand: "Nunito", "Plus Jakarta Sans", system-ui, sans-serif;
   --font-sans: "Plus Jakarta Sans", system-ui, sans-serif;
   --color-brand-50: #fff1f5;
   --color-brand-100: #ffe4ec;
@@ -27,6 +28,15 @@
   body {
     background-color: #fff;
     color: var(--color-ink);
+    /* Avoid content sitting under iOS home indicator / notches */
+    padding-left: env(safe-area-inset-left, 0px);
+    padding-right: env(safe-area-inset-right, 0px);
+  }
+
+  /* Larger tap targets feel better on phones */
+  button,
+  a {
+    -webkit-tap-highlight-color: transparent;
   }
 
   ::selection {
@@ -45,6 +55,14 @@
     font-family: var(--font-display);
   }
 
+  .font-brand {
+    font-family: var(--font-brand);
+    font-weight: 800;
+    letter-spacing: 0.04em;
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+  }
+
   .font-sans-body {
     font-family: var(--font-sans);
   }
@@ -57,6 +75,36 @@
     background: color-mix(in srgb, white 78%, transparent);
     backdrop-filter: blur(16px) saturate(1.4);
     -webkit-backdrop-filter: blur(16px) saturate(1.4);
+  }
+
+  /* Floating action buttons — clear iOS home indicator / Android gesture bar */
+  .float-safe-wa {
+    bottom: calc(1.25rem + env(safe-area-inset-bottom, 0px));
+    right: calc(1.25rem + env(safe-area-inset-right, 0px));
+  }
+
+  .float-safe-call {
+    bottom: calc(5.75rem + env(safe-area-inset-bottom, 0px));
+    right: calc(1.25rem + env(safe-area-inset-right, 0px));
+  }
+
+  .float-safe-wa-menu {
+    bottom: calc(11.5rem + env(safe-area-inset-bottom, 0px));
+    right: calc(1.25rem + env(safe-area-inset-right, 0px));
+  }
+
+  .header-safe-top {
+    padding-top: env(safe-area-inset-top, 0px);
+  }
+
+  .header-offset {
+    height: calc(4.25rem + env(safe-area-inset-top, 0px));
+  }
+
+  @media (min-width: 640px) {
+    .header-offset {
+      height: calc(4.5rem + env(safe-area-inset-top, 0px));
+    }
   }
 
   .surface-card {
