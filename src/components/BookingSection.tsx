@@ -53,6 +53,7 @@ export const BookingSection: React.FC<BookingSectionProps> = ({
   const [submitting, setSubmitting] = useState(false);
   const [takenSlots, setTakenSlots] = useState<string[]>([]);
   const [slotsLoading, setSlotsLoading] = useState(false);
+  const [syncWarning, setSyncWarning] = useState<string | null>(null);
   const [formError, setFormError] = useState<string | null>(null);
   const [lastBookingId, setLastBookingId] = useState<string | undefined>();
   const [lastManageUrl, setLastManageUrl] = useState<string | undefined>();
@@ -91,9 +92,10 @@ export const BookingSection: React.FC<BookingSectionProps> = ({
 
     const load = async () => {
       setSlotsLoading(true);
-      const taken = await fetchTakenSlots(preferredDate, selectedDoctorId);
+      const { taken, error } = await fetchTakenSlots(preferredDate, selectedDoctorId);
       if (cancelled) return;
       setTakenSlots(taken);
+      setSyncWarning(error || null);
       setSlotsLoading(false);
     };
 
@@ -158,12 +160,16 @@ export const BookingSection: React.FC<BookingSectionProps> = ({
         if (result.code === 'SLOT_TAKEN') {
           setSubmitting(false);
           setFormError('That time was just taken. Please pick another slot.');
-          const taken = await fetchTakenSlots(preferredDate, selectedDoctorId);
+          const { taken } = await fetchTakenSlots(preferredDate, selectedDoctorId);
           setTakenSlots(taken);
           return;
         }
         // Soft fallback: open WhatsApp without Sheet lock
-        setFormError(null);
+        setFormError(
+          result.error
+            ? `${result.error} WhatsApp will still open so you can send the request.`
+            : null
+        );
         setLastBookingId(undefined);
         setLastManageUrl(undefined);
       } else {
@@ -402,6 +408,11 @@ export const BookingSection: React.FC<BookingSectionProps> = ({
 
             {formError && (
               <p className="text-xs text-rose-600 font-medium text-center">{formError}</p>
+            )}
+            {syncWarning && !formError && (
+              <p className="text-[11px] text-amber-800 bg-amber-50 border border-amber-200 rounded-xl px-3 py-2 leading-relaxed">
+                Slot calendar not connected yet: {syncWarning}
+              </p>
             )}
 
             <button

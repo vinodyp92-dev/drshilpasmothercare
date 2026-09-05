@@ -4,13 +4,13 @@
  * SETUP (one-time):
  * 1. Create a Google Sheet named "Clinic Bookings".
  * 2. Extensions → Apps Script → paste this entire file → Save.
- * 3. Set SCRIPT_SECRET below to a long random string (same value as VITE_BOOKING_SCRIPT_SECRET).
+ * 3. Set SCRIPT_SECRET below to the same value as BOOKING_SCRIPT_SECRET (Vercel / .env.local).
  * 4. Deploy → New deployment → Type: Web app
  *    - Execute as: Me
- *    - Who has access: Anyone
- * 5. Copy the Web App URL into Vercel / .env.local as VITE_BOOKING_SCRIPT_URL
+ *    - Who has access: Anyone   ← CRITICAL (NOT "Anyone with Google account")
+ * 5. Copy the Web App URL into Vercel as BOOKING_SCRIPT_URL (no VITE_ prefix)
  *
- * Sheet columns are created automatically on first use.
+ * If access is wrong, the site gets a Google login page and no Sheet rows are written.
  */
 
 var SCRIPT_SECRET = 'CHANGE_ME_TO_A_LONG_RANDOM_SECRET';
@@ -72,6 +72,11 @@ function handleRequest(params) {
 
 function getSheet_() {
   var ss = SpreadsheetApp.getActiveSpreadsheet();
+  if (!ss) {
+    throw new Error(
+      'No spreadsheet bound. Open Apps Script from the Sheet (Extensions → Apps Script), not a standalone project.'
+    );
+  }
   var sheet = ss.getSheetByName(SHEET_NAME);
   if (!sheet) {
     sheet = ss.insertSheet(SHEET_NAME);

@@ -79,11 +79,12 @@ async function callApi<T>(
 export async function fetchTakenSlots(
   date: string,
   doctorId: string
-): Promise<string[]> {
-  if (!isBookingSyncEnabled()) return [];
+): Promise<{ taken: string[]; error?: string }> {
   const result = await callApi<{ taken: string[] }>('slots', { date, doctorId });
-  if (!result.ok) return [];
-  return (result.taken || []).map(normalizeTime);
+  if (!result.ok) {
+    return { taken: [], error: result.error || 'Could not load slots' };
+  }
+  return { taken: (result.taken || []).map(normalizeTime) };
 }
 
 export function availableTimesForDate(

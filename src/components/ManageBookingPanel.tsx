@@ -59,7 +59,7 @@ export const ManageBookingPanel: React.FC = () => {
     if (!enabled || !booking || !newDate) return;
     let cancelled = false;
     (async () => {
-      const taken = await fetchTakenSlots(newDate, booking.doctorId);
+      const { taken } = await fetchTakenSlots(newDate, booking.doctorId);
       if (cancelled) return;
       // Keep current slot selectable when staying on the same date
       const takenExceptSelf =
