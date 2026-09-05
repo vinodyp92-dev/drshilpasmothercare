@@ -93,6 +93,8 @@ function ensureHeaders_(sheet) {
     sheet.getRange(1, 1, 1, HEADERS.length).setValues([HEADERS]);
     sheet.setFrozenRows(1);
   }
+  // Keep date + time columns as text
+  sheet.getRange('H:I').setNumberFormat('@');
 }
 
 function readRows_(sheet) {
@@ -114,10 +116,51 @@ function isActiveStatus_(status) {
 }
 
 function normalizeTime_(t) {
-  return String(t || '')
+  return formatSlotLabel_(t);
+}
+
+/** Always return site format: 04:30 PM (Sheets often stores times as Date/number). */
+function formatSlotLabel_(v) {
+  if (Object.prototype.toString.call(v) === '[object Date]' && !isNaN(v.getTime())) {
+    return normalizeClock_(
+      Utilities.formatDate(v, Session.getScriptTimeZone(), 'hh:mm a')
+    );
+  }
+  if (typeof v === 'number' && isFinite(v)) {
+    var totalMinutes = Math.round(v * 24 * 60);
+    var hour24 = Math.floor(totalMinutes / 60) % 24;
+    var minute = totalMinutes % 60;
+    return clockFromParts_(hour24, minute);
+  }
+  return normalizeClock_(String(v || ''));
+}
+
+function normalizeClock_(s) {
+  var raw = String(s || '')
     .replace(/\s+/g, ' ')
     .trim()
     .toUpperCase();
+  var m = raw.match(/^(\d{1,2}):(\d{2})(?::\d{2})?\s*(AM|PM)?$/);
+  if (!m) return raw;
+  var hour = parseInt(m[1], 10);
+  var minute = parseInt(m[2], 10);
+  var period = m[3];
+  if (!period) {
+    // 24h style e.g. 16:30
+    return clockFromParts_(hour, minute);
+  }
+  var hour12 = hour % 12 || 12;
+  var hh = (hour12 < 10 ? '0' : '') + hour12;
+  var mm = (minute < 10 ? '0' : '') + minute;
+  return hh + ':' + mm + ' ' + period;
+}
+
+function clockFromParts_(hour24, minute) {
+  var period = hour24 >= 12 ? 'PM' : 'AM';
+  var hour12 = hour24 % 12 || 12;
+  var hh = (hour12 < 10 ? '0' : '') + hour12;
+  var mm = (minute < 10 ? '0' : '') + minute;
+  return hh + ':' + mm + ' ' + period;
 }
 
 function cellDate_(v) {
@@ -125,6 +168,10 @@ function cellDate_(v) {
     return Utilities.formatDate(v, Session.getScriptTimeZone(), 'yyyy-MM-dd');
   }
   return String(v || '').trim();
+}
+
+function cellTime_(v) {
+  return formatSlotLabel_(v);
 }
 
 function slots_(params) {
@@ -140,13 +187,13 @@ function slots_(params) {
     if (!isActiveStatus_(r.status)) return;
     if (cellDate_(r.date) !== date) return;
     if (doctorId && String(r.doctor_id) !== doctorId) return;
-    taken.push(normalizeTime_(r.time));
+    taken.push(cellTime_(r.time));
   });
 
   // unique
   var uniq = [];
   taken.forEach(function (t) {
-    if (uniq.indexOf(t) === -1) uniq.push(t);
+    if (t && uniq.indexOf(t) === -1) uniq.push(t);
   });
 
   return json_({ ok: true, date: date, doctorId: doctorId, taken: uniq });
@@ -174,7 +221,7 @@ function book_(params) {
       isActiveStatus_(r.status) &&
       cellDate_(r.date) === date &&
       String(r.doctor_id) === doctorId &&
-      normalizeTime_(r.time) === time
+      cellTime_(r.time) === time
     );
   });
 
@@ -185,8 +232,8 @@ function book_(params) {
   var id = Utilities.getUuid().slice(0, 8).toUpperCase();
   var token = Utilities.getUuid().replace(/-/g, '');
   var now = new Date().toISOString();
-
-  sheet.appendRow([
+  var row = sheet.getLastRow() + 1;
+  var values = [
     id,
     now,
     patientName,
@@ -200,7 +247,10 @@ function book_(params) {
     patientType,
     reason,
     token
-  ]);
+  ];
+  // Force date/time as plain text so Sheets does not convert to Date serials
+  sheet.getRange(row, 1, row, HEADERS.length).setNumberFormat('@');
+  sheet.getRange(row, 1, row, HEADERS.length).setValues([values]);
 
   return json_({
     ok: true,
@@ -310,13 +360,15 @@ function reschedule_(params) {
       isActiveStatus_(r.status) &&
       cellDate_(r.date) === date &&
       String(r.doctor_id) === doctorId &&
-      normalizeTime_(r.time) === time
+      cellTime_(r.time) === time
     );
   });
   if (conflict) {
     return json_({ ok: false, error: 'Slot already taken', code: 'SLOT_TAKEN' });
   }
 
+  sheet.getRange(row._row, 8).setNumberFormat('@');
+  sheet.getRange(row._row, 9).setNumberFormat('@');
   sheet.getRange(row._row, 8).setValue(date);
   sheet.getRange(row._row, 9).setValue(time);
   sheet.getRange(row._row, 10).setValue('rescheduled');
@@ -333,7 +385,7 @@ function publicBooking_(row) {
   return {
     id: String(row.id),
     date: cellDate_(row.date),
-    time: normalizeTime_(row.time),
+    time: cellTime_(row.time),
     status: String(row.status),
     doctorId: String(row.doctor_id),
     doctorName: String(row.doctor_name),

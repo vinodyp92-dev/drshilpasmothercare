@@ -13,15 +13,16 @@ import {
 import { DOCTORS_DATA, SERVICES_DATA } from '../data/clinicData';
 import { useClinicConfig } from '../context/ClinicConfigContext';
 import { buildBookingRequestMessage, openWhatsappChat } from '../utils/whatsapp';
-import { BOOKING_TIME_PREFERENCES } from '../utils/clinicHours';
 import {
   availableTimesForDate,
   buildManageUrl,
   createBooking,
   fetchTakenSlots,
+  normalizeTime,
   refreshBookingSyncStatus
 } from '../utils/bookingApi';
 import { ManageBookingPanel } from './ManageBookingPanel';
+import { BOOKING_TIME_PREFERENCES } from '../utils/clinicHours';
 
 interface BookingSectionProps {
   preselectedDoctorId?: string;
@@ -59,6 +60,7 @@ export const BookingSection: React.FC<BookingSectionProps> = ({
   const [lastManageUrl, setLastManageUrl] = useState<string | undefined>();
 
   const activeDoctor = DOCTORS_DATA.find((d) => d.id === selectedDoctorId) || DOCTORS_DATA[0];
+  const takenSet = new Set(takenSlots.map(normalizeTime));
   const availableTimes = syncEnabled
     ? availableTimesForDate(BOOKING_TIME_PREFERENCES, takenSlots)
     : [...BOOKING_TIME_PREFERENCES];
@@ -326,16 +328,28 @@ export const BookingSection: React.FC<BookingSectionProps> = ({
                   disabled={syncEnabled && availableTimes.length === 0}
                   className="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm font-medium focus:ring-2 focus:ring-pink-500 disabled:opacity-60"
                 >
-                  {availableTimes.length === 0 ? (
-                    <option value="">No free slots this day</option>
+                  {syncEnabled ? (
+                    BOOKING_TIME_PREFERENCES.map((t) => {
+                      const booked = takenSet.has(normalizeTime(t));
+                      return (
+                        <option key={t} value={t} disabled={booked}>
+                          {booked ? `${t} — Booked` : t}
+                        </option>
+                      );
+                    })
                   ) : (
-                    availableTimes.map((t) => (
+                    BOOKING_TIME_PREFERENCES.map((t) => (
                       <option key={t} value={t}>
                         {t}
                       </option>
                     ))
                   )}
                 </select>
+                {syncEnabled && takenSlots.length > 0 && (
+                  <p className="text-[10px] text-slate-500 mt-1">
+                    Grayed times are already reserved for this doctor.
+                  </p>
+                )}
               </div>
             </div>
 

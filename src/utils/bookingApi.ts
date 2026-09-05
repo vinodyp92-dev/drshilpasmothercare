@@ -52,8 +52,26 @@ export async function refreshBookingSyncStatus(): Promise<boolean> {
   return syncEnabledCache;
 }
 
-function normalizeTime(t: string): string {
-  return t.replace(/\s+/g, ' ').trim().toUpperCase();
+/** Canonical slot label matching clinicHours: 04:30 PM */
+export function normalizeTime(t: string): string {
+  const raw = String(t || '')
+    .replace(/\s+/g, ' ')
+    .trim()
+    .toUpperCase();
+  const m12 = raw.match(/^(\d{1,2}):(\d{2})(?::\d{2})?\s*(AM|PM)$/);
+  if (m12) {
+    const hour12 = parseInt(m12[1], 10) % 12 || 12;
+    return `${String(hour12).padStart(2, '0')}:${m12[2]} ${m12[3]}`;
+  }
+  const m24 = raw.match(/^(\d{1,2}):(\d{2})(?::\d{2})?$/);
+  if (m24) {
+    const hour24 = parseInt(m24[1], 10);
+    const minute = m24[2];
+    const period = hour24 >= 12 ? 'PM' : 'AM';
+    const hour12 = hour24 % 12 || 12;
+    return `${String(hour12).padStart(2, '0')}:${minute} ${period}`;
+  }
+  return raw;
 }
 
 async function callApi<T>(
