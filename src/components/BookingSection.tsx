@@ -14,6 +14,14 @@ import { DOCTORS_DATA, SERVICES_DATA } from '../data/clinicData';
 import { useClinicConfig } from '../context/ClinicConfigContext';
 import { buildBookingRequestMessage, openWhatsappChat } from '../utils/whatsapp';
 import { BOOKING_TIME_PREFERENCES } from '../utils/clinicHours';
+import {
+  availableTimesForDate,
+  buildManageUrl,
+  createBooking,
+  fetchTakenSlots,
+  isBookingSyncEnabled
+} from '../utils/bookingApi';
+import { ManageBookingPanel } from './ManageBookingPanel';
 
 interface BookingSectionProps {
   preselectedDoctorId?: string;
@@ -25,6 +33,7 @@ export const BookingSection: React.FC<BookingSectionProps> = ({
   preselectedServiceName
 }) => {
   const { config } = useClinicConfig();
+  const syncEnabled = isBookingSyncEnabled();
 
   const [selectedDoctorId, setSelectedDoctorId] = useState(
     preselectedDoctorId || DOCTORS_DATA[0].id
@@ -41,8 +50,17 @@ export const BookingSection: React.FC<BookingSectionProps> = ({
   const [reason, setReason] = useState('');
   const [patientType, setPatientType] = useState<'New Patient' | 'Returning Patient'>('New Patient');
   const [sent, setSent] = useState(false);
+  const [submitting, setSubmitting] = useState(false);
+  const [takenSlots, setTakenSlots] = useState<string[]>([]);
+  const [slotsLoading, setSlotsLoading] = useState(false);
+  const [formError, setFormError] = useState<string | null>(null);
+  const [lastBookingId, setLastBookingId] = useState<string | undefined>();
+  const [lastManageUrl, setLastManageUrl] = useState<string | undefined>();
 
   const activeDoctor = DOCTORS_DATA.find((d) => d.id === selectedDoctorId) || DOCTORS_DATA[0];
+  const availableTimes = syncEnabled
+    ? availableTimesForDate(BOOKING_TIME_PREFERENCES, takenSlots)
+    : [...BOOKING_TIME_PREFERENCES];
 
   useEffect(() => {
     if (preselectedDoctorId) setSelectedDoctorId(preselectedDoctorId);
@@ -51,6 +69,38 @@ export const BookingSection: React.FC<BookingSectionProps> = ({
   useEffect(() => {
     if (preselectedServiceName) setSelectedService(preselectedServiceName);
   }, [preselectedServiceName]);
+
+  // Background slot sync — no-op when Sheet URL is not configured
+  useEffect(() => {
+    if (!syncEnabled) {
+      setTakenSlots([]);
+      return;
+    }
+
+    let cancelled = false;
+
+    const load = async () => {
+      setSlotsLoading(true);
+      const taken = await fetchTakenSlots(preferredDate, selectedDoctorId);
+      if (cancelled) return;
+      setTakenSlots(taken);
+      setSlotsLoading(false);
+    };
+
+    load();
+    const timer = window.setInterval(load, 45000);
+    return () => {
+      cancelled = true;
+      window.clearInterval(timer);
+    };
+  }, [syncEnabled, preferredDate, selectedDoctorId]);
+
+  useEffect(() => {
+    if (!availableTimes.length) return;
+    if (!availableTimes.includes(preferredTime)) {
+      setPreferredTime(availableTimes[0]);
+    }
+  }, [availableTimes, preferredTime]);
 
   const messagePreview = buildBookingRequestMessage({
     clinicName: config.name,
@@ -61,12 +111,60 @@ export const BookingSection: React.FC<BookingSectionProps> = ({
     doctorName: activeDoctor.name,
     service: selectedService,
     patientType,
-    reason
+    reason,
+    bookingId: lastBookingId,
+    manageUrl: lastManageUrl
   });
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!patientName.trim() || !patientPhone.trim() || !preferredDate) return;
+    if (syncEnabled && availableTimes.length === 0) {
+      setFormError('No free slots on this date. Please choose another day.');
+      return;
+    }
+
+    setFormError(null);
+    setSubmitting(true);
+
+    let bookingId: string | undefined;
+    let manageUrl: string | undefined;
+
+    if (syncEnabled) {
+      const result = await createBooking({
+        patientName: patientName.trim(),
+        phone: patientPhone.trim(),
+        doctorId: activeDoctor.id,
+        doctorName: activeDoctor.name,
+        service: selectedService,
+        date: preferredDate,
+        time: preferredTime,
+        patientType,
+        reason: reason.trim()
+      });
+
+      if (!result.ok) {
+        setSubmitting(false);
+        setFormError(
+          result.code === 'SLOT_TAKEN'
+            ? 'That time was just taken. Please pick another slot.'
+            : result.error || 'Could not reserve slot. Try again or WhatsApp us directly.'
+        );
+        // Refresh taken list
+        const taken = await fetchTakenSlots(preferredDate, selectedDoctorId);
+        setTakenSlots(taken);
+        return;
+      }
+
+      bookingId = result.booking.id;
+      const token = result.booking.manageToken;
+      if (token) {
+        manageUrl = buildManageUrl(result.booking.id, token);
+      }
+      setLastBookingId(bookingId);
+      setLastManageUrl(manageUrl);
+      setTakenSlots((prev) => [...prev, preferredTime]);
+    }
 
     const message = buildBookingRequestMessage({
       clinicName: config.name,
@@ -77,10 +175,13 @@ export const BookingSection: React.FC<BookingSectionProps> = ({
       doctorName: activeDoctor.name,
       service: selectedService,
       patientType,
-      reason
+      reason,
+      bookingId,
+      manageUrl
     });
 
     openWhatsappChat(config.receptionistWhatsapp || config.mobile, message);
+    setSubmitting(false);
     setSent(true);
   };
 
@@ -97,7 +198,8 @@ export const BookingSection: React.FC<BookingSectionProps> = ({
           </h2>
           <p className="text-sm sm:text-base text-slate-600 max-w-xl mx-auto leading-relaxed">
             Fill in your details below. We will open WhatsApp with a ready message — send it to
-            reception and they will confirm your slot.
+            reception
+            {syncEnabled ? '. Available times update automatically.' : ' and they will confirm your slot.'}
           </p>
         </div>
 
@@ -106,10 +208,13 @@ export const BookingSection: React.FC<BookingSectionProps> = ({
             <div className="w-14 h-14 rounded-2xl bg-emerald-100 text-emerald-600 mx-auto flex items-center justify-center">
               <CheckCircle2 className="w-8 h-8" />
             </div>
-            <h3 className="text-lg font-extrabold text-slate-900">WhatsApp opened</h3>
+            <h3 className="text-lg font-extrabold text-slate-900">
+              {lastBookingId ? 'Slot reserved · WhatsApp opened' : 'WhatsApp opened'}
+            </h3>
             <p className="text-sm text-slate-600 max-w-md mx-auto">
-              Send the pre-filled message to our reception desk. They will reply with your confirmed
-              appointment time.
+              {lastBookingId
+                ? `Your booking ID is ${lastBookingId}. Send the pre-filled WhatsApp message so reception is notified. Use the link in the message to cancel or change time anytime.`
+                : 'Send the pre-filled message to our reception desk. They will reply with your confirmed appointment time.'}
             </p>
             <div className="flex flex-col sm:flex-row gap-2 justify-center pt-2">
               <button
@@ -127,7 +232,11 @@ export const BookingSection: React.FC<BookingSectionProps> = ({
               </button>
               <button
                 type="button"
-                onClick={() => setSent(false)}
+                onClick={() => {
+                  setSent(false);
+                  setLastBookingId(undefined);
+                  setLastManageUrl(undefined);
+                }}
                 className="btn-secondary px-5 py-2.5 text-sm cursor-pointer"
               >
                 Book another visit
@@ -189,17 +298,25 @@ export const BookingSection: React.FC<BookingSectionProps> = ({
                 <label className="text-xs font-bold text-slate-700 block mb-1.5">
                   <Clock className="w-3.5 h-3.5 inline mr-1 text-pink-600" />
                   Preferred time
+                  {syncEnabled && slotsLoading ? (
+                    <span className="ml-1 font-medium text-slate-400">· syncing…</span>
+                  ) : null}
                 </label>
                 <select
                   value={preferredTime}
                   onChange={(e) => setPreferredTime(e.target.value)}
-                  className="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm font-medium focus:ring-2 focus:ring-pink-500"
+                  disabled={syncEnabled && availableTimes.length === 0}
+                  className="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm font-medium focus:ring-2 focus:ring-pink-500 disabled:opacity-60"
                 >
-                  {BOOKING_TIME_PREFERENCES.map((t) => (
-                    <option key={t} value={t}>
-                      {t}
-                    </option>
-                  ))}
+                  {availableTimes.length === 0 ? (
+                    <option value="">No free slots this day</option>
+                  ) : (
+                    availableTimes.map((t) => (
+                      <option key={t} value={t}>
+                        {t}
+                      </option>
+                    ))
+                  )}
                 </select>
               </div>
             </div>
@@ -271,21 +388,32 @@ export const BookingSection: React.FC<BookingSectionProps> = ({
               />
             </div>
 
+            {formError && (
+              <p className="text-xs text-rose-600 font-medium text-center">{formError}</p>
+            )}
+
             <button
               type="submit"
-              className="btn-primary w-full py-3.5 text-sm cursor-pointer"
+              disabled={submitting || (syncEnabled && availableTimes.length === 0)}
+              className="btn-primary w-full py-3.5 text-sm cursor-pointer disabled:opacity-60"
             >
               <Send className="w-4 h-4" />
-              Send appointment request on WhatsApp
+              {submitting
+                ? 'Reserving slot…'
+                : 'Send appointment request on WhatsApp'}
               <ChevronRight className="w-4 h-4" />
             </button>
 
             <p className="text-[11px] text-center text-slate-500">
-              Reception: {config.receptionistWhatsapp || config.mobile} · Final slot confirmed by
-              clinic staff
+              Reception: {config.receptionistWhatsapp || config.mobile}
+              {syncEnabled
+                ? ' · Slot locks automatically when you submit'
+                : ' · Final slot confirmed by clinic staff'}
             </p>
           </form>
         )}
+
+        <ManageBookingPanel />
       </div>
     </section>
   );

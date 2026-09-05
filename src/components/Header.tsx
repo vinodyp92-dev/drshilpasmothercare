@@ -74,10 +74,10 @@ export const Header: React.FC<HeaderProps> = ({
             <button
               type="button"
               onClick={() => onNavigate('hero')}
-              className="flex items-center gap-2.5 text-left cursor-pointer group min-w-0 flex-shrink-0"
+              className="flex items-center gap-2 sm:gap-2.5 text-left cursor-pointer group min-w-0 flex-1 lg:flex-none"
             >
-              <ClinicLogo size="md" className="w-11 h-11 sm:w-12 sm:h-12 flex-shrink-0" />
-              <ClinicBrandTitle showTagline={false} className="hidden sm:block" />
+              <ClinicLogo size="md" className="w-10 h-10 sm:w-12 sm:h-12 flex-shrink-0" />
+              <ClinicBrandTitle showTagline={false} className="min-w-0" />
             </button>
 
             <nav

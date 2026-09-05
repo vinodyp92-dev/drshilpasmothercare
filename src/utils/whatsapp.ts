@@ -21,11 +21,17 @@ export interface BookingMessageInput {
   service: string;
   patientType?: string;
   reason?: string;
+  /** When Sheet sync reserved the slot */
+  bookingId?: string;
+  manageUrl?: string;
 }
 
 export function buildBookingRequestMessage(input: BookingMessageInput): string {
+  const reserved = Boolean(input.bookingId);
   const lines = [
-    `🌸 *APPOINTMENT REQUEST — ${input.clinicName}*`,
+    reserved
+      ? `🌸 *APPOINTMENT RESERVED — ${input.clinicName}*`
+      : `🌸 *APPOINTMENT REQUEST — ${input.clinicName}*`,
     '----------------------------------------',
     `*Patient Name:* ${input.patientName}`,
     `*Phone:* ${input.patientPhone}`,
@@ -46,10 +52,21 @@ export function buildBookingRequestMessage(input: BookingMessageInput): string {
     lines.push(`*Reason for Visit:* ${input.reason.trim()}`);
   }
 
-  lines.push(
-    '----------------------------------------',
-    'Please confirm my appointment slot. Thank you!'
-  );
+  if (input.bookingId) {
+    lines.push(`*Booking ID:* ${input.bookingId}`);
+  }
+
+  lines.push('----------------------------------------');
+
+  if (reserved) {
+    lines.push('Slot reserved automatically. Sending this message notifies reception.');
+    if (input.manageUrl) {
+      lines.push(`Cancel / change time: ${input.manageUrl}`);
+    }
+    lines.push('Thank you!');
+  } else {
+    lines.push('Please confirm my appointment slot. Thank you!');
+  }
 
   return lines.join('\n');
 }
