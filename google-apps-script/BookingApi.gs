@@ -1,20 +1,25 @@
 /**
  * Dr. Shilpa's MOTHER CARE — Appointment Sheet API
  *
- * SETUP (one-time):
- * 1. Create a Google Sheet named "Clinic Bookings".
- * 2. Extensions → Apps Script → paste this entire file → Save.
- * 3. Set SCRIPT_SECRET below to the same value as BOOKING_SCRIPT_SECRET (Vercel / .env.local).
- * 4. Deploy → New deployment → Type: Web app
+ * SETUP (required for booking to write rows):
+ * 1. Open YOUR Google Sheet → Extensions → Apps Script
+ * 2. Delete any old code, paste this ENTIRE file, Save
+ * 3. Set SCRIPT_SECRET to the SAME value as Vercel BOOKING_SCRIPT_SECRET
+ * 4. Deploy → Manage deployments → Edit (or New deployment)
  *    - Execute as: Me
- *    - Who has access: Anyone   ← CRITICAL (NOT "Anyone with Google account")
- * 5. Copy the Web App URL into Vercel as BOOKING_SCRIPT_URL (no VITE_ prefix)
+ *    - Who has access: Anyone  (NOT "Anyone with Google account")
+ * 5. Deploy → copy Web App URL into Vercel BOOKING_SCRIPT_URL
+ * 6. After EVERY code change: Deploy → Manage deployments → New version
  *
- * If access is wrong, the site gets a Google login page and no Sheet rows are written.
+ * Sheet tab "Bookings" is created automatically.
  */
 
 var SCRIPT_SECRET = 'CHANGE_ME_TO_A_LONG_RANDOM_SECRET';
+/** Optional: if script is not container-bound to the Sheet, paste the Sheet ID here. */
+var SPREADSHEET_ID = '';
 var SHEET_NAME = 'Bookings';
+var API_VERSION = 3;
+
 var HEADERS = [
   'id',
   'created_at',
@@ -54,28 +59,47 @@ function doPost(e) {
 
 function handleRequest(params) {
   try {
-    if (!params.secret || params.secret !== SCRIPT_SECRET) {
-      return json_({ ok: false, error: 'Unauthorized' });
+    if (!params.secret || String(params.secret) !== String(SCRIPT_SECRET)) {
+      return json_({ ok: false, error: 'Unauthorized — SCRIPT_SECRET does not match BOOKING_SCRIPT_SECRET' });
     }
 
     var action = String(params.action || '').toLowerCase();
+    if (action === 'health') {
+      return json_({
+        ok: true,
+        healthy: true,
+        sheet: SHEET_NAME,
+        hasSpreadsheet: Boolean(getSpreadsheet_())
+      });
+    }
     if (action === 'slots') return slots_(params);
     if (action === 'book') return book_(params);
     if (action === 'lookup') return lookup_(params);
     if (action === 'list') return listByPhone_(params);
     if (action === 'cancel') return cancel_(params);
     if (action === 'reschedule') return reschedule_(params);
-    return json_({ ok: false, error: 'Unknown action' });
+    return json_({ ok: false, error: 'Unknown action: ' + action });
   } catch (err) {
-    return json_({ ok: false, error: String(err && err.message ? err.message : err) });
+    return json_({
+      ok: false,
+      error: String(err && err.message ? err.message : err),
+      code: 'SCRIPT_ERROR'
+    });
   }
 }
 
+function getSpreadsheet_() {
+  if (SPREADSHEET_ID && String(SPREADSHEET_ID).trim()) {
+    return SpreadsheetApp.openById(String(SPREADSHEET_ID).trim());
+  }
+  return SpreadsheetApp.getActiveSpreadsheet();
+}
+
 function getSheet_() {
-  var ss = SpreadsheetApp.getActiveSpreadsheet();
+  var ss = getSpreadsheet_();
   if (!ss) {
     throw new Error(
-      'No spreadsheet bound. Open Apps Script from the Sheet (Extensions → Apps Script), not a standalone project.'
+      'No spreadsheet bound. Open Apps Script from the Sheet (Extensions → Apps Script), or set SPREADSHEET_ID.'
     );
   }
   var sheet = ss.getSheetByName(SHEET_NAME);
@@ -87,44 +111,31 @@ function getSheet_() {
 }
 
 function ensureHeaders_(sheet) {
-  var lastCol = Math.max(sheet.getLastColumn(), HEADERS.length);
-  var existing = sheet.getRange(1, 1, 1, lastCol).getValues()[0];
-  var needs = !existing[0] || String(existing[0]).toLowerCase() !== 'id';
+  var width = HEADERS.length;
+  var first = sheet.getRange(1, 1, 1, width).getValues()[0];
+  var needs = !first[0] || String(first[0]).toLowerCase() !== 'id';
   if (needs) {
-    sheet.getRange(1, 1, 1, HEADERS.length).setValues([HEADERS]);
+    sheet.getRange(1, 1, 1, width).setValues([HEADERS]);
     sheet.setFrozenRows(1);
   }
-  // Do NOT format entire columns H:I — that inflates getLastRow() and breaks appends.
 }
 
-/** Last row that has an id in column A (ignores format-only "used" rows). */
-function lastIdRow_(sheet) {
-  var last = sheet.getLastRow();
-  if (last < 1) return 0;
-  var scanTo = Math.min(Math.max(last, 1), 3000);
-  var ids = sheet.getRange(1, 1, scanTo, 1).getValues();
-  var max = 0;
-  for (var i = 0; i < ids.length; i++) {
-    if (String(ids[i][0] || '').trim() !== '') max = i + 1;
-  }
-  return max;
+/** Digits only, last 10 (Indian mobile). */
+function normalizePhone_(p) {
+  var d = String(p || '').replace(/\D/g, '');
+  if (d.length >= 10) return d.slice(-10);
+  return d;
 }
 
-function readRows_(sheet) {
-  var lastRow = lastIdRow_(sheet);
-  if (lastRow < 2) return [];
-  var values = sheet.getRange(2, 1, lastRow, HEADERS.length).getValues();
-  return values.map(function (row, idx) {
-    var obj = { _row: idx + 2 };
-    HEADERS.forEach(function (h, i) {
-      obj[h] = row[i];
-    });
-    return obj;
-  });
+function phoneMatches_(stored, input) {
+  var a = normalizePhone_(stored);
+  var b = normalizePhone_(input);
+  if (!a || !b) return false;
+  return a === b;
 }
 
 function isActiveStatus_(status) {
-  var s = String(status || '').toLowerCase();
+  var s = String(status || '').toLowerCase().trim();
   return s === 'confirmed' || s === 'pending' || s === 'rescheduled';
 }
 
@@ -132,7 +143,6 @@ function normalizeTime_(t) {
   return formatSlotLabel_(t);
 }
 
-/** Always return site format: 04:30 PM (Sheets often stores times as Date/number). */
 function formatSlotLabel_(v) {
   if (Object.prototype.toString.call(v) === '[object Date]' && !isNaN(v.getTime())) {
     return normalizeClock_(
@@ -158,10 +168,7 @@ function normalizeClock_(s) {
   var hour = parseInt(m[1], 10);
   var minute = parseInt(m[2], 10);
   var period = m[3];
-  if (!period) {
-    // 24h style e.g. 16:30
-    return clockFromParts_(hour, minute);
-  }
+  if (!period) return clockFromParts_(hour, minute);
   var hour12 = hour % 12 || 12;
   var hh = (hour12 < 10 ? '0' : '') + hour12;
   var mm = (minute < 10 ? '0' : '') + minute;
@@ -187,34 +194,50 @@ function cellTime_(v) {
   return formatSlotLabel_(v);
 }
 
+/** Read rows by scanning column A for real ids (avoids inflated getLastRow). */
+function readRows_(sheet) {
+  var last = sheet.getLastRow();
+  if (last < 2) return [];
+  var scanTo = Math.min(Math.max(last, 2), 5000);
+  var values = sheet.getRange(2, 1, scanTo, HEADERS.length).getValues();
+  var rows = [];
+  for (var i = 0; i < values.length; i++) {
+    var id = String(values[i][0] || '').trim();
+    if (!id) continue;
+    var obj = { _row: i + 2 };
+    HEADERS.forEach(function (h, col) {
+      obj[h] = values[i][col];
+    });
+    rows.push(obj);
+  }
+  return rows;
+}
+
 function slots_(params) {
   var date = String(params.date || '');
   var doctorId = String(params.doctorId || params.doctor_id || '');
   if (!date) return json_({ ok: false, error: 'date required' });
 
-  var sheet = getSheet_();
-  var rows = readRows_(sheet);
+  var rows = readRows_(getSheet_());
   var taken = [];
-
   rows.forEach(function (r) {
     if (!isActiveStatus_(r.status)) return;
     if (cellDate_(r.date) !== date) return;
     if (doctorId && String(r.doctor_id) !== doctorId) return;
-    taken.push(cellTime_(r.time));
+    var t = cellTime_(r.time);
+    if (t && taken.indexOf(t) === -1) taken.push(t);
   });
 
-  // unique
-  var uniq = [];
-  taken.forEach(function (t) {
-    if (t && uniq.indexOf(t) === -1) uniq.push(t);
-  });
-
-  return json_({ ok: true, date: date, doctorId: doctorId, taken: uniq });
+  return json_({ ok: true, date: date, doctorId: doctorId, taken: taken });
 }
 
+/**
+ * Book using appendRow only — most reliable write path in Apps Script.
+ * Avoids merged-cell / setValues row-count errors.
+ */
 function book_(params) {
   var patientName = String(params.patientName || params.patient_name || '').trim();
-  var phone = String(params.phone || '').trim();
+  var phone = normalizePhone_(params.phone || '');
   var doctorId = String(params.doctorId || params.doctor_id || '').trim();
   var doctorName = String(params.doctorName || params.doctor_name || '').trim();
   var service = String(params.service || '').trim();
@@ -223,8 +246,11 @@ function book_(params) {
   var patientType = String(params.patientType || params.patient_type || 'New Patient').trim();
   var reason = String(params.reason || '').trim();
 
-  if (!patientName || !phone || !date || !time || !doctorId) {
-    return json_({ ok: false, error: 'Missing required fields' });
+  if (!patientName || phone.length < 10 || !date || !time || !doctorId) {
+    return json_({
+      ok: false,
+      error: 'Missing required fields (name, 10-digit phone, date, time, doctor)'
+    });
   }
 
   var sheet = getSheet_();
@@ -237,7 +263,6 @@ function book_(params) {
       cellTime_(r.time) === time
     );
   });
-
   if (conflict) {
     return json_({ ok: false, error: 'Slot already taken', code: 'SLOT_TAKEN' });
   }
@@ -245,10 +270,9 @@ function book_(params) {
   var id = Utilities.getUuid().slice(0, 8).toUpperCase();
   var token = Utilities.getUuid().replace(/-/g, '');
   var now = new Date().toISOString();
-  var row = lastIdRow_(sheet) + 1;
-  if (row < 2) row = 2;
 
-  var values = [
+  // Plain append — never use setValues on a computed multi-row range
+  sheet.appendRow([
     id,
     now,
     patientName,
@@ -262,17 +286,26 @@ function book_(params) {
     patientType,
     reason,
     token
-  ];
+  ]);
 
-  var range = sheet.getRange(row, 1, row, HEADERS.length);
+  // Best-effort: force date/time cells on the row we just wrote to plain text
   try {
-    // Avoid "data has 1 but range has N" when cells are merged
-    range.breakApart();
-  } catch (ignore) {}
-  range.setValues([values]);
-  // Text only these two cells as text (not whole columns)
-  sheet.getRange(row, 8).setNumberFormat('@').setValue(String(date));
-  sheet.getRange(row, 9).setNumberFormat('@').setValue(String(time));
+    var written = sheet.getLastRow();
+    // Verify the id landed on that row; if getLastRow is inflated, find by id
+    var checkId = String(sheet.getRange(written, 1).getValue() || '');
+    if (checkId !== id) {
+      var found = readRows_(sheet).filter(function (r) {
+        return String(r.id) === id;
+      })[0];
+      if (found) written = found._row;
+    }
+    sheet.getRange(written, 8, written, 9).setNumberFormat('@');
+    sheet.getRange(written, 8).setValue(date);
+    sheet.getRange(written, 9).setValue(time);
+    sheet.getRange(written, 4).setNumberFormat('@').setValue(phone);
+  } catch (formatErr) {
+    // Row is already appended — formatting failure must not fail the booking
+  }
 
   return json_({
     ok: true,
@@ -302,25 +335,13 @@ function findByIdAndToken_(rows, id, token) {
   return null;
 }
 
-function phoneMatches_(stored, input) {
-  var a = String(stored || '').replace(/\D/g, '');
-  var b = String(input || '').replace(/\D/g, '');
-  if (!a || !b) return false;
-  if (a === b) return true;
-  if (a.length >= 10 && b.length >= 10) {
-    return a.slice(-10) === b.slice(-10);
-  }
-  return a.slice(-4) === b.slice(-4);
-}
-
 function lookup_(params) {
   var id = String(params.id || params.bookingId || '').trim();
   var token = String(params.manageToken || params.token || '').trim();
   var phone = String(params.phone || '').trim();
   if (!id || !token) return json_({ ok: false, error: 'id and manageToken required' });
 
-  var sheet = getSheet_();
-  var row = findByIdAndToken_(readRows_(sheet), id, token);
+  var row = findByIdAndToken_(readRows_(getSheet_()), id, token);
   if (!row) return json_({ ok: false, error: 'Booking not found' });
   if (phone && !phoneMatches_(row.phone, phone)) {
     return json_({ ok: false, error: 'Phone does not match' });
@@ -334,19 +355,14 @@ function lookup_(params) {
   });
 }
 
-/** Phone-first list — standard self-serve pattern (Calendly / Practo style). */
 function listByPhone_(params) {
-  var phone = String(params.phone || '').trim();
-  if (!phone) return json_({ ok: false, error: 'phone required' });
-  var digits = phone.replace(/\D/g, '');
-  if (digits.length < 10) {
+  var phone = normalizePhone_(params.phone || '');
+  if (phone.length < 10) {
     return json_({ ok: false, error: 'Enter a valid 10-digit mobile number' });
   }
 
-  var sheet = getSheet_();
-  var rows = readRows_(sheet);
+  var rows = readRows_(getSheet_());
   var bookings = [];
-
   rows.forEach(function (r) {
     if (!isActiveStatus_(r.status)) return;
     if (!phoneMatches_(r.phone, phone)) return;
@@ -363,14 +379,14 @@ function listByPhone_(params) {
     return ka < kb ? -1 : ka > kb ? 1 : 0;
   });
 
-  return json_({ ok: true, bookings: bookings });
+  return json_({ ok: true, phone: phone, count: bookings.length, bookings: bookings });
 }
 
 function cancel_(params) {
   var id = String(params.id || params.bookingId || '').trim();
   var token = String(params.manageToken || params.token || '').trim();
-  var phone = String(params.phone || '').trim();
-  if (!id || !token || !phone) {
+  var phone = normalizePhone_(params.phone || '');
+  if (!id || !token || phone.length < 10) {
     return json_({ ok: false, error: 'id, manageToken, and phone required' });
   }
 
@@ -385,16 +401,19 @@ function cancel_(params) {
   }
 
   sheet.getRange(row._row, 10).setValue('cancelled');
-  return json_({ ok: true, booking: publicBooking_(Object.assign({}, row, { status: 'cancelled' })) });
+  return json_({
+    ok: true,
+    booking: publicBooking_(Object.assign({}, row, { status: 'cancelled' }))
+  });
 }
 
 function reschedule_(params) {
   var id = String(params.id || params.bookingId || '').trim();
   var token = String(params.manageToken || params.token || '').trim();
-  var phone = String(params.phone || '').trim();
+  var phone = normalizePhone_(params.phone || '');
   var date = String(params.date || '').trim();
   var time = normalizeTime_(params.time);
-  if (!id || !token || !phone || !date || !time) {
+  if (!id || !token || phone.length < 10 || !date || !time) {
     return json_({ ok: false, error: 'Missing required fields' });
   }
 
@@ -423,10 +442,8 @@ function reschedule_(params) {
     return json_({ ok: false, error: 'Slot already taken', code: 'SLOT_TAKEN' });
   }
 
-  sheet.getRange(row._row, 8).setNumberFormat('@');
-  sheet.getRange(row._row, 9).setNumberFormat('@');
-  sheet.getRange(row._row, 8).setValue(date);
-  sheet.getRange(row._row, 9).setValue(time);
+  sheet.getRange(row._row, 8).setNumberFormat('@').setValue(date);
+  sheet.getRange(row._row, 9).setNumberFormat('@').setValue(time);
   sheet.getRange(row._row, 10).setValue('rescheduled');
 
   return json_({
@@ -447,13 +464,13 @@ function publicBooking_(row) {
     doctorName: String(row.doctor_name),
     service: String(row.service),
     patientName: String(row.patient_name),
-    phone: String(row.phone)
+    phone: normalizePhone_(row.phone)
   };
 }
 
 function json_(obj) {
   obj = obj || {};
-  if (obj.apiVersion === undefined) obj.apiVersion = 2;
+  if (obj.apiVersion === undefined) obj.apiVersion = API_VERSION;
   return ContentService.createTextOutput(JSON.stringify(obj)).setMimeType(
     ContentService.MimeType.JSON
   );

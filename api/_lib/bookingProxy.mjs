@@ -10,6 +10,7 @@
 
 const ALLOWED_ACTIONS = new Set([
   'status',
+  'health',
   'slots',
   'book',
   'lookup',

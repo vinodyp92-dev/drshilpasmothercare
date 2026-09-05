@@ -158,32 +158,31 @@ export const BookingSection: React.FC<BookingSectionProps> = ({
       });
 
       if (!result.ok) {
-        // Hard block only for real conflicts; otherwise keep WhatsApp booking working
+        setSubmitting(false);
         if (result.code === 'SLOT_TAKEN') {
-          setSubmitting(false);
           setFormError('That time was just taken. Please pick another slot.');
           const { taken } = await fetchTakenSlots(preferredDate, selectedDoctorId);
           setTakenSlots(taken);
           return;
         }
-        // Sheet write failed — still open WhatsApp, but make the failure obvious
+        // Do not pretend success — Sheet write is required when sync is on
         setFormError(
           result.error
-            ? `Could not save to clinic calendar: ${result.error}`
-            : 'Could not save to clinic calendar. WhatsApp will still open.'
+            ? `Booking not saved to calendar: ${result.error}. Please try again or call reception.`
+            : 'Booking not saved to calendar. Please try again or call reception.'
         );
-        setLastBookingId(undefined);
-        setLastManageUrl(undefined);
-      } else {
-        bookingId = result.booking.id;
-        const token = result.booking.manageToken;
-        if (token) {
-          manageUrl = buildManageUrl(result.booking.id, token);
-        }
-        setLastBookingId(bookingId);
-        setLastManageUrl(manageUrl);
-        setTakenSlots((prev) => [...prev, preferredTime]);
+        return;
       }
+
+      bookingId = result.booking.id;
+      const token = result.booking.manageToken;
+      if (token) {
+        manageUrl = buildManageUrl(result.booking.id, token);
+      }
+      setLastBookingId(bookingId);
+      setLastManageUrl(manageUrl);
+      setTakenSlots((prev) => [...prev, preferredTime]);
+      setFormError(null);
     }
 
     const message = buildBookingRequestMessage({

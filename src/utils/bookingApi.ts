@@ -116,9 +116,11 @@ export function availableTimesForDate(
 export async function createBooking(
   input: BookAppointmentInput
 ): Promise<ApiOk<{ booking: BookingRecord }> | ApiErr> {
+  const phoneDigits = input.phone.replace(/\D/g, '');
+  const phone = phoneDigits.length >= 10 ? phoneDigits.slice(-10) : phoneDigits;
   return callApi<{ booking: BookingRecord }>('book', {
     patientName: input.patientName,
-    phone: input.phone,
+    phone,
     doctorId: input.doctorId,
     doctorName: input.doctorName,
     service: input.service,
@@ -144,7 +146,9 @@ export async function lookupBooking(
 export async function listBookingsByPhone(
   phone: string
 ): Promise<ApiOk<{ bookings: BookingRecord[] }> | ApiErr> {
-  return callApi<{ bookings: BookingRecord[] }>('list', { phone });
+  const digits = phone.replace(/\D/g, '');
+  const normalized = digits.length >= 10 ? digits.slice(-10) : digits;
+  return callApi<{ bookings: BookingRecord[] }>('list', { phone: normalized });
 }
 
 export async function cancelBooking(

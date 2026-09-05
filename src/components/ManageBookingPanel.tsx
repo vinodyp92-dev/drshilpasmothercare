@@ -113,7 +113,9 @@ export const ManageBookingPanel: React.FC = () => {
     const list = result.bookings || [];
     setBookings(list);
     if (list.length === 0) {
-      setError('No active appointments found for this number.');
+      setError(
+        'No active appointments for this number. If you just booked, the Sheet may not have saved — try booking again and confirm a Booking ID appears.'
+      );
       setStep('find');
       return;
     }
