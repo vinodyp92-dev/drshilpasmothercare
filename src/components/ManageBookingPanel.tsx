@@ -1,18 +1,11 @@
 import React, { useEffect, useState } from 'react';
-import {
-  Calendar,
-  Clock,
-  Phone,
-  RefreshCw,
-  XCircle,
-  ArrowLeft,
-  ArrowRight
-} from 'lucide-react';
+import { Calendar, Clock, Phone, RefreshCw, XCircle, CalendarClock } from 'lucide-react';
 import {
   BOOKING_TIME_PREFERENCES,
   availableTimesForDate,
   cancelBooking,
   fetchTakenSlots,
+  listBookingsByPhone,
   lookupBooking,
   normalizeTime,
   parseManageHash,
@@ -21,19 +14,19 @@ import {
   type BookingRecord
 } from '../utils/bookingApi';
 
-type ManageMode = 'menu' | 'reschedule' | 'cancel';
+type Step = 'find' | 'list' | 'reschedule' | 'cancel';
 
 /**
- * Self-serve cancel / postpone / prepone.
- * Opened via #manage=BOOKINGID.TOKEN from WhatsApp, or manually below the booking form.
+ * Standard self-serve flow (phone → list → Reschedule / Cancel).
+ * Deep link #manage=ID.TOKEN still supported from WhatsApp.
  */
 export const ManageBookingPanel: React.FC = () => {
   const [enabled, setEnabled] = useState(false);
-  const [bookingId, setBookingId] = useState('');
-  const [manageToken, setManageToken] = useState('');
+  const [step, setStep] = useState<Step>('find');
   const [phone, setPhone] = useState('');
+  const [bookings, setBookings] = useState<BookingRecord[]>([]);
   const [booking, setBooking] = useState<BookingRecord | null>(null);
-  const [mode, setMode] = useState<ManageMode>('menu');
+  const [manageToken, setManageToken] = useState('');
   const [newDate, setNewDate] = useState('');
   const [newTime, setNewTime] = useState('');
   const [available, setAvailable] = useState<string[]>([...BOOKING_TIME_PREFERENCES]);
@@ -51,14 +44,28 @@ export const ManageBookingPanel: React.FC = () => {
     };
   }, []);
 
+  // WhatsApp deep link: auto-load that booking
   useEffect(() => {
     if (!enabled) return;
-    const applyHash = () => {
+    const applyHash = async () => {
       const parsed = parseManageHash(window.location.hash);
-      if (parsed) {
-        setBookingId(parsed.id);
-        setManageToken(parsed.token);
+      if (!parsed) return;
+      setBusy(true);
+      setError(null);
+      const result = await lookupBooking(parsed.id, parsed.token);
+      setBusy(false);
+      if (!result.ok) {
+        setError(result.error || 'Could not open that booking link');
+        return;
       }
+      const token = result.booking.manageToken || parsed.token;
+      setBooking({ ...result.booking, manageToken: token });
+      setManageToken(token);
+      setPhone(result.booking.phone || '');
+      setNewDate(result.booking.date);
+      setNewTime(result.booking.time);
+      setBookings([{ ...result.booking, manageToken: token }]);
+      setStep('list');
     };
     applyHash();
     window.addEventListener('hashchange', applyHash);
@@ -66,17 +73,14 @@ export const ManageBookingPanel: React.FC = () => {
   }, [enabled]);
 
   useEffect(() => {
-    if (!enabled || !booking || !newDate || mode !== 'reschedule') return;
+    if (!enabled || !booking || step !== 'reschedule' || !newDate) return;
     let cancelled = false;
     (async () => {
       const { taken } = await fetchTakenSlots(newDate, booking.doctorId);
       if (cancelled) return;
       const takenExceptSelf =
         newDate === booking.date
-          ? taken.filter(
-              (t) =>
-                normalizeTime(t) !== normalizeTime(booking.time)
-            )
+          ? taken.filter((t) => normalizeTime(t) !== normalizeTime(booking.time))
           : taken;
       const free = availableTimesForDate(BOOKING_TIME_PREFERENCES, takenExceptSelf);
       setAvailable(free);
@@ -85,52 +89,80 @@ export const ManageBookingPanel: React.FC = () => {
     return () => {
       cancelled = true;
     };
-  }, [enabled, booking, newDate, mode]);
+  }, [enabled, booking, newDate, step]);
 
   if (!enabled) return null;
 
-  const handleLookup = async () => {
+  const handleFind = async () => {
     setError(null);
     setMessage(null);
-    setBusy(true);
-    const result = await lookupBooking(bookingId.trim(), manageToken.trim(), phone.trim());
-    setBusy(false);
-    if (!result.ok) {
-      setBooking(null);
-      setError(result.error || 'Could not find booking');
+    const digits = phone.replace(/\D/g, '');
+    if (digits.length < 10) {
+      setError('Enter the 10-digit mobile number used while booking.');
       return;
     }
-    setBooking(result.booking);
-    setNewDate(result.booking.date);
-    setNewTime(result.booking.time);
-    setMode('menu');
+    setBusy(true);
+    const result = await listBookingsByPhone(phone.trim());
+    setBusy(false);
+    if (!result.ok) {
+      setBookings([]);
+      setBooking(null);
+      setError(result.error || 'Could not find appointments');
+      return;
+    }
+    const list = result.bookings || [];
+    setBookings(list);
+    if (list.length === 0) {
+      setError('No active appointments found for this number.');
+      setStep('find');
+      return;
+    }
+    setStep('list');
+    if (list.length === 1) {
+      setBooking(list[0]);
+      setManageToken(list[0].manageToken || '');
+      setNewDate(list[0].date);
+      setNewTime(list[0].time);
+    }
+  };
+
+  const selectBooking = (b: BookingRecord) => {
+    setBooking(b);
+    setManageToken(b.manageToken || '');
+    setNewDate(b.date);
+    setNewTime(b.time);
+    setError(null);
+    setMessage(null);
   };
 
   const handleCancel = async () => {
     if (!booking) return;
+    const token = manageToken || booking.manageToken || '';
     setError(null);
     setMessage(null);
     setBusy(true);
-    const result = await cancelBooking(booking.id, manageToken.trim(), phone.trim());
+    const result = await cancelBooking(booking.id, token, phone.trim() || booking.phone);
     setBusy(false);
     if (!result.ok) {
       setError(result.error || 'Cancel failed');
       return;
     }
-    setBooking(result.booking);
-    setMode('menu');
-    setMessage('Appointment cancelled. That slot is free again for others.');
+    setMessage('Appointment cancelled. That slot is free again.');
+    setBookings((prev) => prev.filter((b) => b.id !== booking.id));
+    setBooking(null);
+    setStep('list');
   };
 
   const handleReschedule = async () => {
     if (!booking || !newDate || !newTime) return;
+    const token = manageToken || booking.manageToken || '';
     setError(null);
     setMessage(null);
     setBusy(true);
     const result = await rescheduleBooking(
       booking.id,
-      manageToken.trim(),
-      phone.trim(),
+      token,
+      phone.trim() || booking.phone,
       newDate,
       newTime
     );
@@ -143,10 +175,16 @@ export const ManageBookingPanel: React.FC = () => {
       );
       return;
     }
-    setBooking(result.booking);
-    setMode('menu');
-    setMessage(`Updated to ${result.booking.date} at ${result.booking.time}.`);
+    const updated = {
+      ...result.booking,
+      manageToken: token
+    };
+    setBooking(updated);
+    setBookings((prev) => prev.map((b) => (b.id === updated.id ? updated : b)));
+    setMessage(`Rescheduled to ${updated.date} at ${updated.time}.`);
+    setStep('list');
   };
+
   return (
     <div
       id="manage-booking"
@@ -154,195 +192,221 @@ export const ManageBookingPanel: React.FC = () => {
     >
       <div>
         <h3 className="text-base sm:text-lg font-extrabold text-slate-900">
-          Cancel · Postpone · Prepone
+          Manage your appointment
         </h3>
         <p className="text-xs text-slate-500 mt-1 leading-relaxed">
-          Already booked? Find your appointment with the Booking ID and manage code from your
-          WhatsApp confirmation, then choose an action.
+          Enter the mobile number you used to book. Then cancel or pick a new time — no booking
+          code needed.
         </p>
       </div>
 
-      <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
-        <input
-          type="text"
-          value={bookingId}
-          onChange={(e) => setBookingId(e.target.value.toUpperCase())}
-          placeholder="Booking ID"
-          className="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm font-medium focus:ring-2 focus:ring-pink-500"
-        />
-        <input
-          type="text"
-          value={manageToken}
-          onChange={(e) => setManageToken(e.target.value)}
-          placeholder="Manage code"
-          className="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm font-medium focus:ring-2 focus:ring-pink-500"
-        />
-        <input
-          type="tel"
-          value={phone}
-          onChange={(e) => setPhone(e.target.value)}
-          placeholder="Mobile used at booking"
-          className="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm font-medium focus:ring-2 focus:ring-pink-500"
-        />
-      </div>
-
-      <button
-        type="button"
-        disabled={busy || !bookingId || !manageToken}
-        onClick={handleLookup}
-        className="btn-secondary px-4 py-2 text-xs cursor-pointer disabled:opacity-50"
-      >
-        <RefreshCw className={`w-3.5 h-3.5 ${busy ? 'animate-spin' : ''}`} />
-        Find appointment
-      </button>
+      {step === 'find' && (
+        <div className="space-y-3">
+          <label className="text-xs font-bold text-slate-700 block">
+            <Phone className="w-3.5 h-3.5 inline mr-1 text-pink-600" />
+            Mobile number
+          </label>
+          <div className="flex flex-col sm:flex-row gap-2">
+            <input
+              type="tel"
+              value={phone}
+              onChange={(e) => setPhone(e.target.value)}
+              placeholder="e.g. 98765 43210"
+              className="flex-1 w-full p-3 bg-slate-50 border border-slate-200 rounded-xl text-sm font-medium focus:ring-2 focus:ring-pink-500"
+            />
+            <button
+              type="button"
+              disabled={busy}
+              onClick={handleFind}
+              className="btn-primary px-5 py-3 text-xs cursor-pointer disabled:opacity-50 shrink-0"
+            >
+              <RefreshCw className={`w-3.5 h-3.5 ${busy ? 'animate-spin' : ''}`} />
+              Find appointments
+            </button>
+          </div>
+        </div>
+      )}
 
       {error && <p className="text-xs text-rose-600 font-medium">{error}</p>}
       {message && <p className="text-xs text-emerald-700 font-medium">{message}</p>}
 
-      {booking && (
-        <div className="rounded-2xl bg-slate-50 border border-slate-200 p-4 space-y-4">
-          <div className="text-xs text-slate-700 space-y-1">
-            <p className="font-bold text-slate-900">
-              {booking.patientName} · {booking.id} · {booking.status}
+      {step === 'list' && (
+        <div className="space-y-3">
+          <div className="flex items-center justify-between gap-2">
+            <p className="text-xs font-semibold text-slate-700">
+              {bookings.length} active appointment{bookings.length === 1 ? '' : 's'}
             </p>
-            <p>
-              {booking.date} · {booking.time}
-            </p>
-            <p>
-              {booking.doctorName} · {booking.service}
-            </p>
+            <button
+              type="button"
+              onClick={() => {
+                setStep('find');
+                setBookings([]);
+                setBooking(null);
+                setError(null);
+                setMessage(null);
+              }}
+              className="text-[11px] font-bold text-pink-700 hover:underline cursor-pointer"
+            >
+              Use another number
+            </button>
           </div>
 
-          {booking.status !== 'cancelled' && mode === 'menu' && (
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
-              <button
-                type="button"
-                onClick={() => {
-                  setMode('reschedule');
-                  setMessage(null);
-                  setError(null);
-                }}
-                className="inline-flex items-center justify-center gap-1.5 px-3 py-2.5 text-xs font-bold rounded-xl border border-pink-200 text-pink-800 bg-pink-50 hover:bg-pink-100 cursor-pointer"
-              >
-                <ArrowRight className="w-3.5 h-3.5" />
-                Postpone
-              </button>
-              <button
-                type="button"
-                onClick={() => {
-                  setMode('reschedule');
-                  setMessage(null);
-                  setError(null);
-                }}
-                className="inline-flex items-center justify-center gap-1.5 px-3 py-2.5 text-xs font-bold rounded-xl border border-violet-200 text-violet-800 bg-violet-50 hover:bg-violet-100 cursor-pointer"
-              >
-                <ArrowLeft className="w-3.5 h-3.5" />
-                Prepone
-              </button>
-              <button
-                type="button"
-                onClick={() => {
-                  setMode('cancel');
-                  setMessage(null);
-                  setError(null);
-                }}
-                className="inline-flex items-center justify-center gap-1.5 px-3 py-2.5 text-xs font-bold rounded-xl border border-rose-200 text-rose-700 bg-rose-50 hover:bg-rose-100 cursor-pointer"
-              >
-                <XCircle className="w-3.5 h-3.5" />
-                Cancel
-              </button>
-            </div>
-          )}
-
-          {booking.status !== 'cancelled' && mode === 'reschedule' && (
-            <div className="space-y-3">
-              <p className="text-[11px] text-slate-600">
-                Pick a new date and time. Choosing a later slot postpones; an earlier slot
-                prepones.
-              </p>
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
-                <div>
-                  <label className="text-[10px] font-bold text-slate-600 block mb-1">
-                    <Calendar className="w-3 h-3 inline mr-1" />
-                    New date
-                  </label>
-                  <input
-                    type="date"
-                    value={newDate}
-                    min={new Date().toISOString().split('T')[0]}
-                    onChange={(e) => setNewDate(e.target.value)}
-                    className="w-full p-2 bg-white border border-slate-200 rounded-lg text-sm"
-                  />
-                </div>
-                <div>
-                  <label className="text-[10px] font-bold text-slate-600 block mb-1">
-                    <Clock className="w-3 h-3 inline mr-1" />
-                    New time
-                  </label>
-                  <select
-                    value={newTime}
-                    onChange={(e) => setNewTime(e.target.value)}
-                    className="w-full p-2 bg-white border border-slate-200 rounded-lg text-sm"
+          {bookings.length === 0 ? (
+            <p className="text-xs text-slate-500">No active appointments left for this number.</p>
+          ) : (
+            <ul className="space-y-2">
+              {bookings.map((b) => {
+                const selected = booking?.id === b.id;
+                return (
+                  <li
+                    key={b.id}
+                    className={`rounded-2xl border p-3 space-y-3 transition-colors ${
+                      selected
+                        ? 'border-pink-300 bg-pink-50/60'
+                        : 'border-slate-200 bg-slate-50'
+                    }`}
                   >
-                    {available.map((t) => (
-                      <option key={t} value={t}>
-                        {t}
-                      </option>
-                    ))}
-                  </select>
-                </div>
-              </div>
-              <div className="flex flex-col sm:flex-row gap-2">
-                <button
-                  type="button"
-                  disabled={busy || !newDate || !newTime}
-                  onClick={handleReschedule}
-                  className="btn-primary px-4 py-2 text-xs cursor-pointer disabled:opacity-50"
-                >
-                  <RefreshCw className="w-3.5 h-3.5" />
-                  Confirm new time
-                </button>
-                <button
-                  type="button"
-                  onClick={() => setMode('menu')}
-                  className="btn-secondary px-4 py-2 text-xs cursor-pointer"
-                >
-                  Back
-                </button>
-              </div>
-            </div>
-          )}
+                    <button
+                      type="button"
+                      onClick={() => selectBooking(b)}
+                      className="w-full text-left cursor-pointer"
+                    >
+                      <p className="text-sm font-bold text-slate-900">
+                        {b.date} · {b.time}
+                      </p>
+                      <p className="text-[11px] text-slate-600 mt-0.5">
+                        {b.doctorName} · {b.service}
+                      </p>
+                      <p className="text-[10px] text-slate-400 mt-0.5">
+                        ID {b.id} · {b.status}
+                      </p>
+                    </button>
 
-          {booking.status !== 'cancelled' && mode === 'cancel' && (
-            <div className="space-y-3">
-              <p className="text-[11px] text-rose-700">
-                This will cancel your appointment and free the slot for other patients.
-              </p>
-              <div className="flex flex-col sm:flex-row gap-2">
-                <button
-                  type="button"
-                  disabled={busy}
-                  onClick={handleCancel}
-                  className="inline-flex items-center justify-center gap-1.5 px-4 py-2 text-xs font-bold rounded-xl border border-rose-200 text-rose-700 bg-rose-50 hover:bg-rose-100 cursor-pointer disabled:opacity-50"
-                >
-                  <XCircle className="w-3.5 h-3.5" />
-                  Yes, cancel appointment
-                </button>
-                <button
-                  type="button"
-                  onClick={() => setMode('menu')}
-                  className="btn-secondary px-4 py-2 text-xs cursor-pointer"
-                >
-                  Back
-                </button>
-              </div>
-            </div>
+                    {selected && b.status !== 'cancelled' && (
+                      <div className="flex flex-col sm:flex-row gap-2 pt-1 border-t border-pink-100">
+                        <button
+                          type="button"
+                          onClick={() => {
+                            setStep('reschedule');
+                            setError(null);
+                            setMessage(null);
+                          }}
+                          className="btn-primary flex-1 py-2.5 text-xs cursor-pointer"
+                        >
+                          <CalendarClock className="w-3.5 h-3.5" />
+                          Reschedule
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => {
+                            setStep('cancel');
+                            setError(null);
+                            setMessage(null);
+                          }}
+                          className="inline-flex flex-1 items-center justify-center gap-1.5 px-4 py-2.5 text-xs font-bold rounded-xl border border-rose-200 text-rose-700 bg-rose-50 hover:bg-rose-100 cursor-pointer"
+                        >
+                          <XCircle className="w-3.5 h-3.5" />
+                          Cancel
+                        </button>
+                      </div>
+                    )}
+                  </li>
+                );
+              })}
+            </ul>
           )}
+          {bookings.length > 1 && !booking && (
+            <p className="text-[11px] text-slate-500">Tap an appointment to manage it.</p>
+          )}
+        </div>
+      )}
 
-          <p className="text-[10px] text-slate-500 flex items-center gap-1">
-            <Phone className="w-3 h-3" />
-            Mobile must match the number used when booking.
+      {step === 'reschedule' && booking && (
+        <div className="rounded-2xl bg-slate-50 border border-slate-200 p-4 space-y-3">
+          <p className="text-xs font-bold text-slate-900">
+            Reschedule · currently {booking.date} at {booking.time}
           </p>
+          <p className="text-[11px] text-slate-600">
+            Pick any free slot. A later time postpones; an earlier time prepones.
+          </p>
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+            <div>
+              <label className="text-[10px] font-bold text-slate-600 block mb-1">
+                <Calendar className="w-3 h-3 inline mr-1" />
+                New date
+              </label>
+              <input
+                type="date"
+                value={newDate}
+                min={new Date().toISOString().split('T')[0]}
+                onChange={(e) => setNewDate(e.target.value)}
+                className="w-full p-2.5 bg-white border border-slate-200 rounded-lg text-sm"
+              />
+            </div>
+            <div>
+              <label className="text-[10px] font-bold text-slate-600 block mb-1">
+                <Clock className="w-3 h-3 inline mr-1" />
+                New time
+              </label>
+              <select
+                value={newTime}
+                onChange={(e) => setNewTime(e.target.value)}
+                className="w-full p-2.5 bg-white border border-slate-200 rounded-lg text-sm"
+              >
+                {available.map((t) => (
+                  <option key={t} value={t}>
+                    {t}
+                  </option>
+                ))}
+              </select>
+            </div>
+          </div>
+          <div className="flex flex-col sm:flex-row gap-2">
+            <button
+              type="button"
+              disabled={busy || !newDate || !newTime}
+              onClick={handleReschedule}
+              className="btn-primary px-4 py-2.5 text-xs cursor-pointer disabled:opacity-50"
+            >
+              Confirm new time
+            </button>
+            <button
+              type="button"
+              onClick={() => setStep('list')}
+              className="btn-secondary px-4 py-2.5 text-xs cursor-pointer"
+            >
+              Back
+            </button>
+          </div>
+        </div>
+      )}
+
+      {step === 'cancel' && booking && (
+        <div className="rounded-2xl bg-rose-50 border border-rose-200 p-4 space-y-3">
+          <p className="text-xs font-bold text-rose-900">
+            Cancel {booking.date} at {booking.time}?
+          </p>
+          <p className="text-[11px] text-rose-800">
+            This frees the slot for other patients. You can book again anytime.
+          </p>
+          <div className="flex flex-col sm:flex-row gap-2">
+            <button
+              type="button"
+              disabled={busy}
+              onClick={handleCancel}
+              className="inline-flex items-center justify-center gap-1.5 px-4 py-2.5 text-xs font-bold rounded-xl border border-rose-300 text-white bg-rose-600 hover:bg-rose-700 cursor-pointer disabled:opacity-50"
+            >
+              <XCircle className="w-3.5 h-3.5" />
+              Yes, cancel
+            </button>
+            <button
+              type="button"
+              onClick={() => setStep('list')}
+              className="btn-secondary px-4 py-2.5 text-xs cursor-pointer"
+            >
+              Keep appointment
+            </button>
+          </div>
         </div>
       )}
     </div>

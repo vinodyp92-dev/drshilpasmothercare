@@ -61,7 +61,8 @@ export function buildBookingRequestMessage(input: BookingMessageInput): string {
   if (reserved) {
     lines.push('Slot reserved automatically. Sending this message notifies reception.');
     if (input.manageUrl) {
-      lines.push(`Cancel / change time: ${input.manageUrl}`);
+      lines.push(`Manage / cancel / reschedule: ${input.manageUrl}`);
+      lines.push('(Or open the website → booking section → enter your mobile number.)');
     }
     lines.push('Thank you!');
   } else {

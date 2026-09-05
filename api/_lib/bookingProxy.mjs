@@ -13,6 +13,7 @@ const ALLOWED_ACTIONS = new Set([
   'slots',
   'book',
   'lookup',
+  'list',
   'cancel',
   'reschedule'
 ]);

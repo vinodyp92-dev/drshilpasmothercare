@@ -1,17 +1,10 @@
-import React, { useState } from 'react';
-import { MapPin, Phone, Navigation, ChevronDown, ChevronUp } from 'lucide-react';
-import { getClinicFaqs } from '../utils/faq';
+import React from 'react';
+import { MapPin, Phone, Navigation } from 'lucide-react';
 import { useClinicConfig } from '../context/ClinicConfigContext';
 import { formatTelHref } from '../utils/phone';
 
 export const LocationHours: React.FC = () => {
   const { config } = useClinicConfig();
-  const faqs = getClinicFaqs(config);
-  const [openFaq, setOpenFaq] = useState<number | null>(0);
-
-  const toggleFaq = (idx: number) => {
-    setOpenFaq(openFaq === idx ? null : idx);
-  };
 
   return (
     <section id="location" className="py-16 sm:py-20 bg-white border-t border-slate-200/80 scroll-mt-28">
@@ -19,7 +12,7 @@ export const LocationHours: React.FC = () => {
         <div className="text-center max-w-3xl mx-auto space-y-3">
           <span className="text-xs font-bold uppercase tracking-wider text-pink-800 bg-pink-50 px-3.5 py-1 rounded-full border border-pink-200/80 inline-flex items-center gap-1.5">
             <MapPin className="w-3.5 h-3.5 text-pink-600" />
-            Location & FAQs
+            Location
           </span>
           <h2 className="text-3xl sm:text-4xl font-extrabold text-slate-900 tracking-tight">
             Visit Our Clinic in Tumakuru
@@ -68,13 +61,18 @@ export const LocationHours: React.FC = () => {
                 </div>
                 <div className="flex justify-between py-1">
                   <span className="text-slate-500 font-medium">Email Desk:</span>
-                  <span className="font-semibold text-slate-800">{config.email}</span>
+                  <a
+                    href={`mailto:${config.email}`}
+                    className="font-semibold text-pink-700 hover:underline break-all text-right max-w-[60%]"
+                  >
+                    {config.email}
+                  </a>
                 </div>
               </div>
             </div>
           </div>
 
-          <div className="lg:col-span-7 space-y-6">
+          <div className="lg:col-span-7">
             <div className="bg-slate-100 rounded-3xl border border-pink-200 overflow-hidden relative shadow-md h-80 sm:h-[22rem]">
               <iframe
                 title={`${config.name} location map`}
@@ -99,30 +97,6 @@ export const LocationHours: React.FC = () => {
                   <Navigation className="w-3.5 h-3.5" />
                   Google Maps Directions
                 </a>
-              </div>
-            </div>
-
-            <div className="space-y-3 pt-2">
-              <h3 className="text-lg font-extrabold text-slate-900">Patient FAQs</h3>
-
-              <div className="space-y-2">
-                {faqs.map((faq, idx) => (
-                  <div key={idx} className="bg-pink-50/40 rounded-2xl border border-pink-200/80 overflow-hidden">
-                    <button
-                      type="button"
-                      onClick={() => toggleFaq(idx)}
-                      className="w-full p-4 text-left font-bold text-xs sm:text-sm text-slate-900 flex items-center justify-between hover:bg-pink-50 transition-colors cursor-pointer"
-                    >
-                      <span>{faq.question}</span>
-                      {openFaq === idx ? <ChevronUp className="w-4 h-4 text-pink-600" /> : <ChevronDown className="w-4 h-4 text-slate-400" />}
-                    </button>
-                    {openFaq === idx && (
-                      <div className="px-4 pb-4 text-xs text-slate-600 leading-relaxed border-t border-pink-100 pt-3 bg-white font-medium">
-                        {faq.answer}
-                      </div>
-                    )}
-                  </div>
-                ))}
               </div>
             </div>
           </div>

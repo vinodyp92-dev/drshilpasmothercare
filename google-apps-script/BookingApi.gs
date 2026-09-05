@@ -62,6 +62,7 @@ function handleRequest(params) {
     if (action === 'slots') return slots_(params);
     if (action === 'book') return book_(params);
     if (action === 'lookup') return lookup_(params);
+    if (action === 'list') return listByPhone_(params);
     if (action === 'cancel') return cancel_(params);
     if (action === 'reschedule') return reschedule_(params);
     return json_({ ok: false, error: 'Unknown action' });
@@ -306,8 +307,42 @@ function lookup_(params) {
 
   return json_({
     ok: true,
-    booking: publicBooking_(row)
+    booking: Object.assign(publicBooking_(row), {
+      manageToken: String(row.manage_token || '')
+    })
   });
+}
+
+/** Phone-first list — standard self-serve pattern (Calendly / Practo style). */
+function listByPhone_(params) {
+  var phone = String(params.phone || '').trim();
+  if (!phone) return json_({ ok: false, error: 'phone required' });
+  var digits = phone.replace(/\D/g, '');
+  if (digits.length < 10) {
+    return json_({ ok: false, error: 'Enter a valid 10-digit mobile number' });
+  }
+
+  var sheet = getSheet_();
+  var rows = readRows_(sheet);
+  var bookings = [];
+
+  rows.forEach(function (r) {
+    if (!isActiveStatus_(r.status)) return;
+    if (!phoneMatches_(r.phone, phone)) return;
+    bookings.push(
+      Object.assign(publicBooking_(r), {
+        manageToken: String(r.manage_token || '')
+      })
+    );
+  });
+
+  bookings.sort(function (a, b) {
+    var ka = String(a.date) + ' ' + String(a.time);
+    var kb = String(b.date) + ' ' + String(b.time);
+    return ka < kb ? -1 : ka > kb ? 1 : 0;
+  });
+
+  return json_({ ok: true, bookings: bookings });
 }
 
 function cancel_(params) {

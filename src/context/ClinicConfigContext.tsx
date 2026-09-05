@@ -42,7 +42,7 @@ export const CLINIC_CONFIG: ClinicConfig = {
   mobile: '9900047256/9743033256',
   mobileAlt: '9743033256',
   emergencyHotline: '9743033256',
-  email: 'care@drshilpamothercare.in',
+  email: 'dr.shilpasmothercare@gmail.com',
   googleMapsUrl: 'https://maps.app.goo.gl/VXiQtJ3etaJ2tbB1A',
   googleMapsEmbedUrl:
     'https://www.google.com/maps?q=Dr.+Shilpa%27s+MOTHER+CARE,+Shettihalli+Main+Rd,+Dasappa+Garden,+Tumakuru,+Karnataka+572102&z=16&output=embed',

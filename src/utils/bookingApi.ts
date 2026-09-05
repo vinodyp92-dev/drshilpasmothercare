@@ -141,6 +141,12 @@ export async function lookupBooking(
   });
 }
 
+export async function listBookingsByPhone(
+  phone: string
+): Promise<ApiOk<{ bookings: BookingRecord[] }> | ApiErr> {
+  return callApi<{ bookings: BookingRecord[] }>('list', { phone });
+}
+
 export async function cancelBooking(
   id: string,
   manageToken: string,

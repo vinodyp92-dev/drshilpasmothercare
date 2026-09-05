@@ -12,14 +12,13 @@ interface HeaderProps {
   activeSection: string;
 }
 
-const HEADER_CALL_NUMBER = '9743033256';
-
 export const Header: React.FC<HeaderProps> = ({
   onOpenBooking,
   onNavigate,
   activeSection
 }) => {
   const { config } = useClinicConfig();
+  const headerCallNumber = config.receptionistWhatsapp || '9900047256';
   const [isScrolled, setIsScrolled] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
@@ -130,7 +129,7 @@ export const Header: React.FC<HeaderProps> = ({
               )}
 
               <a
-                href={formatTelHref(HEADER_CALL_NUMBER)}
+                href={formatTelHref(headerCallNumber)}
                 className="hidden sm:inline-flex items-center gap-1.5 px-3.5 py-2 text-xs font-bold text-pink-800 bg-pink-50 hover:bg-pink-100 border border-pink-200 rounded-full transition-colors"
               >
                 <Phone className="w-3.5 h-3.5" />
@@ -187,11 +186,11 @@ export const Header: React.FC<HeaderProps> = ({
                   </a>
                 )}
                 <a
-                  href={formatTelHref(HEADER_CALL_NUMBER)}
+                  href={formatTelHref(headerCallNumber)}
                   className="btn-secondary w-full py-2.5 text-xs inline-flex items-center justify-center gap-1.5"
                 >
                   <Phone className="w-3.5 h-3.5" />
-                  Call {HEADER_CALL_NUMBER}
+                  Call {headerCallNumber}
                 </a>
               </div>
             </div>

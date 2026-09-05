@@ -1,19 +1,21 @@
 import React from 'react';
 import { Phone } from 'lucide-react';
 import { formatTelHref } from '../utils/phone';
+import { useClinicConfig } from '../context/ClinicConfigContext';
 
 type CallNumbersMenuProps = {
   variant?: 'header' | 'hero' | 'mobile';
   className?: string;
 };
 
-/** Single clinic call number used across header / hero CTAs */
-const CALL_NUMBER = '9743033256';
-
+/** Reception call number for header / hero CTAs (not emergency). */
 export const CallNumbersMenu: React.FC<CallNumbersMenuProps> = ({
   variant = 'header',
   className = ''
 }) => {
+  const { config } = useClinicConfig();
+  const callNumber = config.receptionistWhatsapp || '9900047256';
+
   const triggerClass =
     variant === 'hero'
       ? 'inline-flex items-center justify-center gap-2 px-5 py-3.5 rounded-[0.9rem] text-sm font-bold text-pink-900 border border-pink-300/80 bg-white/70 hover:bg-white backdrop-blur-sm transition-colors'
@@ -23,9 +25,9 @@ export const CallNumbersMenu: React.FC<CallNumbersMenuProps> = ({
 
   return (
     <a
-      href={formatTelHref(CALL_NUMBER)}
+      href={formatTelHref(callNumber)}
       className={`${triggerClass} ${className}`}
-      aria-label={`Call clinic at ${CALL_NUMBER}`}
+      aria-label={`Call reception at ${callNumber}`}
     >
       <Phone className="w-4 h-4" />
       <span>{variant === 'hero' ? 'Call us' : 'Call'}</span>
